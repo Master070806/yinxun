@@ -1,0 +1,15 @@
+.venv*/
+__pycache__/
+.cache/
+data/
+outputs/
+.env
+.env.*
+!.env.example
+*.pt
+*.pth
+*.safetensors
+*.wav
+*.mp3
+*.ogg
+*.flac

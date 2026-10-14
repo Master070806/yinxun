@@ -1,0 +1,1581 @@
+{
+  "model": "laion/clap-htsat-unfused",
+  "revision": "8fa0f1c6d0433df6e97c127f64b2a1d6c0dcda8a",
+  "aggregation": "Duration-weighted mean of normalized 10-second embeddings, then normalized",
+  "prompts": {
+    "classical": "Classical orchestral music with strings and acoustic instruments.",
+    "jazz": "Jazz music with swing rhythm and improvised instrumental solos.",
+    "folk": "Folk music with acoustic instruments and a singer.",
+    "pop": "Pop music with a catchy vocal melody and a steady rhythm.",
+    "rock": "Rock music with electric guitars, bass and drums.",
+    "metal": "Heavy metal music with distorted guitars and aggressive drums.",
+    "hip_hop": "Hip hop music with rapping over a rhythmic beat.",
+    "electronic": "Electronic music with synthesizers and programmed drums.",
+    "blues": "Blues music with expressive guitar and blues phrasing.",
+    "country": "Country music with acoustic guitar, twang and storytelling vocals.",
+    "reggae": "Reggae music with offbeat guitar chords and a prominent bass line.",
+    "funk": "Funk music with syncopated bass and tight rhythmic grooves."
+  },
+  "tracks": [
+    {
+      "id": "USUAN1900026",
+      "title": "Aquarium",
+      "artist": "Kevin MacLeod",
+      "source_genre_id": "4",
+      "description": "Saint-Saens' masterpiece. This piece is 100% free to use. It will probably get claimed by any number of music publishers, just so you know. They can't tell the difference between this and their copyrighted recordings. Contest the claims. Contest all the claims. I do not claim music.",
+      "source_url": "https://incompetech.com/music/royalty-free/music.html",
+      "audio_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Aquarium.mp3",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "duration": 144.01,
+      "sha256": "1f52f8d577c4ff6cc56c9acef25793c1d15c614dd2625f48772a9f4f63e8583d",
+      "configuration": "5db385be183884934d7662e8843ed7867321afccb436aea40e51124ee8bd7bb6",
+      "style_scores": [
+        {
+          "label": "classical",
+          "cosine_similarity": 0.47106
+        },
+        {
+          "label": "folk",
+          "cosine_similarity": 0.39279
+        },
+        {
+          "label": "pop",
+          "cosine_similarity": 0.33742
+        },
+        {
+          "label": "jazz",
+          "cosine_similarity": 0.31395
+        },
+        {
+          "label": "blues",
+          "cosine_similarity": 0.2702
+        },
+        {
+          "label": "electronic",
+          "cosine_similarity": 0.25063
+        },
+        {
+          "label": "country",
+          "cosine_similarity": 0.2304
+        },
+        {
+          "label": "reggae",
+          "cosine_similarity": 0.20672
+        },
+        {
+          "label": "funk",
+          "cosine_similarity": 0.17124
+        },
+        {
+          "label": "hip_hop",
+          "cosine_similarity": 0.12996
+        },
+        {
+          "label": "rock",
+          "cosine_similarity": 0.05423
+        },
+        {
+          "label": "metal",
+          "cosine_similarity": 0.01089
+        }
+      ],
+      "audio": "/audio/USUAN1900026.mp3"
+    },
+    {
+      "id": "USUAN1200072",
+      "title": "Hall of the Mountain King",
+      "artist": "Kevin MacLeod",
+      "source_genre_id": "4",
+      "description": "Edvard Grieg's famous piece from Peer Gynt (1876). You know this piece.  Starts quiet - ends loud. This is a \"cinematic mix\" that is a little sharper than most recordings and less dynamic. Source recordings placed into the Public Domain by the MusOpen project.",
+      "source_url": "https://incompetech.com/music/royalty-free/music.html",
+      "audio_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Hall%20of%20the%20Mountain%20King.mp3",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "duration": 152.98,
+      "sha256": "2e73e3525158b1ec0ff2b1abe30bbe01d8871823880f2c2327fbe04b349f5e43",
+      "configuration": "5db385be183884934d7662e8843ed7867321afccb436aea40e51124ee8bd7bb6",
+      "style_scores": [
+        {
+          "label": "jazz",
+          "cosine_similarity": 0.4913
+        },
+        {
+          "label": "folk",
+          "cosine_similarity": 0.48008
+        },
+        {
+          "label": "classical",
+          "cosine_similarity": 0.46686
+        },
+        {
+          "label": "reggae",
+          "cosine_similarity": 0.27937
+        },
+        {
+          "label": "funk",
+          "cosine_similarity": 0.27508
+        },
+        {
+          "label": "blues",
+          "cosine_similarity": 0.2722
+        },
+        {
+          "label": "hip_hop",
+          "cosine_similarity": 0.24624
+        },
+        {
+          "label": "pop",
+          "cosine_similarity": 0.20889
+        },
+        {
+          "label": "country",
+          "cosine_similarity": 0.19406
+        },
+        {
+          "label": "electronic",
+          "cosine_similarity": 0.15459
+        },
+        {
+          "label": "rock",
+          "cosine_similarity": 0.13505
+        },
+        {
+          "label": "metal",
+          "cosine_similarity": 0.1086
+        }
+      ],
+      "audio": "/audio/USUAN1200072.mp3"
+    },
+    {
+      "id": "USUAN1700068",
+      "title": "Backbay Lounge",
+      "artist": "Kevin MacLeod",
+      "source_genre_id": "11",
+      "description": "This is cool. You can walk into a dinner party, grab a glass of prosecco, kiss the host, then casually defuse a large bomb one second before the timer runs out. That level of cool. Maybe you're not that cool, but if you adopt this as your personal theme tune, people will THINK you're that cool.",
+      "source_url": "https://incompetech.com/music/royalty-free/music.html",
+      "audio_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Backbay%20Lounge.mp3",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "duration": 266.55,
+      "sha256": "9567e71a213b0026341b2c0ecd226950e7653abd235cf520fb9aee4247d74d96",
+      "configuration": "5db385be183884934d7662e8843ed7867321afccb436aea40e51124ee8bd7bb6",
+      "style_scores": [
+        {
+          "label": "jazz",
+          "cosine_similarity": 0.66479
+        },
+        {
+          "label": "reggae",
+          "cosine_similarity": 0.62135
+        },
+        {
+          "label": "blues",
+          "cosine_similarity": 0.56704
+        },
+        {
+          "label": "funk",
+          "cosine_similarity": 0.51967
+        },
+        {
+          "label": "folk",
+          "cosine_similarity": 0.50065
+        },
+        {
+          "label": "country",
+          "cosine_similarity": 0.47012
+        },
+        {
+          "label": "rock",
+          "cosine_similarity": 0.44857
+        },
+        {
+          "label": "hip_hop",
+          "cosine_similarity": 0.44048
+        },
+        {
+          "label": "pop",
+          "cosine_similarity": 0.42841
+        },
+        {
+          "label": "classical",
+          "cosine_similarity": 0.35923
+        },
+        {
+          "label": "metal",
+          "cosine_similarity": 0.35052
+        },
+        {
+          "label": "electronic",
+          "cosine_similarity": 0.31172
+        }
+      ],
+      "audio": "/audio/USUAN1700068.mp3"
+    },
+    {
+      "id": "USUAN1100202",
+      "title": "Hot Swing",
+      "artist": "Kevin MacLeod",
+      "source_genre_id": "11",
+      "description": "A nice upbeat swing tune with a change-up in the middle, and big ending.",
+      "source_url": "https://incompetech.com/music/royalty-free/music.html",
+      "audio_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Hot%20Swing.mp3",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "duration": 50.06,
+      "sha256": "b8ffccb85d145b00d39505fcd405a27a7b632af153db54862511209c2232cdc5",
+      "configuration": "5db385be183884934d7662e8843ed7867321afccb436aea40e51124ee8bd7bb6",
+      "style_scores": [
+        {
+          "label": "jazz",
+          "cosine_similarity": 0.59559
+        },
+        {
+          "label": "funk",
+          "cosine_similarity": 0.50364
+        },
+        {
+          "label": "reggae",
+          "cosine_similarity": 0.48001
+        },
+        {
+          "label": "blues",
+          "cosine_similarity": 0.4505
+        },
+        {
+          "label": "rock",
+          "cosine_similarity": 0.36036
+        },
+        {
+          "label": "hip_hop",
+          "cosine_similarity": 0.35819
+        },
+        {
+          "label": "folk",
+          "cosine_similarity": 0.31424
+        },
+        {
+          "label": "pop",
+          "cosine_similarity": 0.31107
+        },
+        {
+          "label": "metal",
+          "cosine_similarity": 0.2941
+        },
+        {
+          "label": "classical",
+          "cosine_similarity": 0.25431
+        },
+        {
+          "label": "electronic",
+          "cosine_similarity": 0.24459
+        },
+        {
+          "label": "country",
+          "cosine_similarity": 0.21828
+        }
+      ],
+      "audio": "/audio/USUAN1100202.mp3"
+    },
+    {
+      "id": "USUAN1100715",
+      "title": "Porch Swing Days - slower",
+      "artist": "Kevin MacLeod",
+      "source_genre_id": "5",
+      "description": "Acoustic guitars play a constantly flowing feel-good melody, enhanced by an airy chorus that enters early in the piece. The music is bright and evokes a carefree attitude towards life and the troubles of the world.",
+      "source_url": "https://incompetech.com/music/royalty-free/music.html",
+      "audio_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Porch%20Swing%20Days%20-%20slower.mp3",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "duration": 216.29,
+      "sha256": "f1d2c17ccbbee215561d5930343d8211f0bc34d2d8eee7125214cd2b028963ba",
+      "configuration": "5db385be183884934d7662e8843ed7867321afccb436aea40e51124ee8bd7bb6",
+      "style_scores": [
+        {
+          "label": "country",
+          "cosine_similarity": 0.70073
+        },
+        {
+          "label": "jazz",
+          "cosine_similarity": 0.65885
+        },
+        {
+          "label": "blues",
+          "cosine_similarity": 0.60714
+        },
+        {
+          "label": "reggae",
+          "cosine_similarity": 0.5992
+        },
+        {
+          "label": "pop",
+          "cosine_similarity": 0.56836
+        },
+        {
+          "label": "folk",
+          "cosine_similarity": 0.55187
+        },
+        {
+          "label": "rock",
+          "cosine_similarity": 0.45605
+        },
+        {
+          "label": "hip_hop",
+          "cosine_similarity": 0.42573
+        },
+        {
+          "label": "funk",
+          "cosine_similarity": 0.38033
+        },
+        {
+          "label": "electronic",
+          "cosine_similarity": 0.3792
+        },
+        {
+          "label": "classical",
+          "cosine_similarity": 0.37662
+        },
+        {
+          "label": "metal",
+          "cosine_similarity": 0.32874
+        }
+      ],
+      "audio": "/audio/USUAN1100715.mp3"
+    },
+    {
+      "id": "USUAN1400037",
+      "title": "Carefree",
+      "artist": "Kevin MacLeod",
+      "source_genre_id": "5",
+      "description": "Nothing says \"It'll be okay\" quite like a ukulele.",
+      "source_url": "https://incompetech.com/music/royalty-free/music.html",
+      "audio_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Carefree.mp3",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "duration": 205.14,
+      "sha256": "8433b770a630d9b1594fd484442c677907ece899a4d149954cd2e74fd733e311",
+      "configuration": "5db385be183884934d7662e8843ed7867321afccb436aea40e51124ee8bd7bb6",
+      "style_scores": [
+        {
+          "label": "jazz",
+          "cosine_similarity": 0.71843
+        },
+        {
+          "label": "pop",
+          "cosine_similarity": 0.59611
+        },
+        {
+          "label": "folk",
+          "cosine_similarity": 0.56206
+        },
+        {
+          "label": "country",
+          "cosine_similarity": 0.50466
+        },
+        {
+          "label": "hip_hop",
+          "cosine_similarity": 0.50048
+        },
+        {
+          "label": "reggae",
+          "cosine_similarity": 0.49761
+        },
+        {
+          "label": "funk",
+          "cosine_similarity": 0.46195
+        },
+        {
+          "label": "blues",
+          "cosine_similarity": 0.43494
+        },
+        {
+          "label": "electronic",
+          "cosine_similarity": 0.32153
+        },
+        {
+          "label": "rock",
+          "cosine_similarity": 0.30635
+        },
+        {
+          "label": "metal",
+          "cosine_similarity": 0.19132
+        },
+        {
+          "label": "classical",
+          "cosine_similarity": 0.18386
+        }
+      ],
+      "audio": "/audio/USUAN1400037.mp3"
+    },
+    {
+      "id": "USUAN2000020",
+      "title": "Aerosol of my Love",
+      "artist": "Kevin MacLeod",
+      "source_genre_id": "16",
+      "description": "The title of this piece of music is a pun. The word \"Aerosol\" is a reference to a common hair product delivery method of the 1980s. \"Aerosol\" can very easily sound like the words \"Here is all\" or even \"There is all\".  One can effectively hear the title spoken out loud as \"Here is all of my Love\". But they would be wrong.   I don't like the usage of aerosols in applications where there are other delivery methods available. #ClawBangs",
+      "source_url": "https://incompetech.com/music/royalty-free/music.html",
+      "audio_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Aerosol%20of%20my%20Love.mp3",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "duration": 141.82,
+      "sha256": "64b13f986f69b2054c44562f7795be14c09d600c8052cc5bf2346ea109af0bc8",
+      "configuration": "5db385be183884934d7662e8843ed7867321afccb436aea40e51124ee8bd7bb6",
+      "style_scores": [
+        {
+          "label": "pop",
+          "cosine_similarity": 0.63584
+        },
+        {
+          "label": "electronic",
+          "cosine_similarity": 0.59104
+        },
+        {
+          "label": "reggae",
+          "cosine_similarity": 0.51964
+        },
+        {
+          "label": "funk",
+          "cosine_similarity": 0.51705
+        },
+        {
+          "label": "jazz",
+          "cosine_similarity": 0.48317
+        },
+        {
+          "label": "hip_hop",
+          "cosine_similarity": 0.46843
+        },
+        {
+          "label": "rock",
+          "cosine_similarity": 0.36316
+        },
+        {
+          "label": "country",
+          "cosine_similarity": 0.31553
+        },
+        {
+          "label": "metal",
+          "cosine_similarity": 0.27836
+        },
+        {
+          "label": "blues",
+          "cosine_similarity": 0.25261
+        },
+        {
+          "label": "folk",
+          "cosine_similarity": 0.2297
+        },
+        {
+          "label": "classical",
+          "cosine_similarity": 0.16241
+        }
+      ],
+      "audio": "/audio/USUAN2000020.mp3"
+    },
+    {
+      "id": "USUAN1400054",
+      "title": "Life of Riley",
+      "artist": "Kevin MacLeod",
+      "source_genre_id": "16",
+      "description": "Mid-tempo cheery music for all!",
+      "source_url": "https://incompetech.com/music/royalty-free/music.html",
+      "audio_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Life%20of%20Riley.mp3",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "duration": 235.36,
+      "sha256": "1916f05cd1860949f9241e17966d334c39852b531329e4a05802720bb154c564",
+      "configuration": "5db385be183884934d7662e8843ed7867321afccb436aea40e51124ee8bd7bb6",
+      "style_scores": [
+        {
+          "label": "jazz",
+          "cosine_similarity": 0.72655
+        },
+        {
+          "label": "pop",
+          "cosine_similarity": 0.69687
+        },
+        {
+          "label": "country",
+          "cosine_similarity": 0.65374
+        },
+        {
+          "label": "folk",
+          "cosine_similarity": 0.60997
+        },
+        {
+          "label": "reggae",
+          "cosine_similarity": 0.57001
+        },
+        {
+          "label": "blues",
+          "cosine_similarity": 0.51622
+        },
+        {
+          "label": "hip_hop",
+          "cosine_similarity": 0.49367
+        },
+        {
+          "label": "funk",
+          "cosine_similarity": 0.45194
+        },
+        {
+          "label": "electronic",
+          "cosine_similarity": 0.42687
+        },
+        {
+          "label": "rock",
+          "cosine_similarity": 0.4142
+        },
+        {
+          "label": "metal",
+          "cosine_similarity": 0.26417
+        },
+        {
+          "label": "classical",
+          "cosine_similarity": 0.25936
+        }
+      ],
+      "audio": "/audio/USUAN1400054.mp3"
+    },
+    {
+      "id": "USUAN1700018",
+      "title": "Surf Shimmy",
+      "artist": "Kevin MacLeod",
+      "source_genre_id": "19",
+      "description": "I gotta admit, I've never been to a clambake, only ever fish boils... which are similar, except for clambakes usually involve mollusks and giant sea-bugs, and fish boils involve fish. Also, clambakes are more steaming and fish boils are more boiling. You're more likely to see Green Bay Packers jerseys at fish boils, and more likely to see New England Patriots jerseys at clambakes. This music is west-coast, though... The more I think about it - the less useful this descriptive paragraph becomes. Uncompressed download comes with a couple mild variations, including \"Psychedelic\".",
+      "source_url": "https://incompetech.com/music/royalty-free/music.html",
+      "audio_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Surf%20Shimmy.mp3",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "duration": 122.88,
+      "sha256": "932424252801c51a6385c1339ebb57571cee76eda6431eaa338dcacb677c4d94",
+      "configuration": "5db385be183884934d7662e8843ed7867321afccb436aea40e51124ee8bd7bb6",
+      "style_scores": [
+        {
+          "label": "rock",
+          "cosine_similarity": 0.69051
+        },
+        {
+          "label": "metal",
+          "cosine_similarity": 0.68851
+        },
+        {
+          "label": "reggae",
+          "cosine_similarity": 0.55877
+        },
+        {
+          "label": "jazz",
+          "cosine_similarity": 0.51896
+        },
+        {
+          "label": "funk",
+          "cosine_similarity": 0.48146
+        },
+        {
+          "label": "blues",
+          "cosine_similarity": 0.42817
+        },
+        {
+          "label": "electronic",
+          "cosine_similarity": 0.40469
+        },
+        {
+          "label": "hip_hop",
+          "cosine_similarity": 0.32691
+        },
+        {
+          "label": "country",
+          "cosine_similarity": 0.32463
+        },
+        {
+          "label": "pop",
+          "cosine_similarity": 0.29069
+        },
+        {
+          "label": "folk",
+          "cosine_similarity": 0.16245
+        },
+        {
+          "label": "classical",
+          "cosine_similarity": 0.0778
+        }
+      ],
+      "audio": "/audio/USUAN1700018.mp3"
+    },
+    {
+      "id": "USUAN1400046",
+      "title": "Twisted",
+      "artist": "Kevin MacLeod",
+      "source_genre_id": "19",
+      "description": "A modern take on a 1970’s rock style.",
+      "source_url": "https://incompetech.com/music/royalty-free/music.html",
+      "audio_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Twisted.mp3",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "duration": 187.19,
+      "sha256": "56a2305a7b0356a9e0054fc4d8636a6d86f366578618f7271880136defe7ccda",
+      "configuration": "5db385be183884934d7662e8843ed7867321afccb436aea40e51124ee8bd7bb6",
+      "style_scores": [
+        {
+          "label": "metal",
+          "cosine_similarity": 0.59073
+        },
+        {
+          "label": "reggae",
+          "cosine_similarity": 0.57661
+        },
+        {
+          "label": "rock",
+          "cosine_similarity": 0.54513
+        },
+        {
+          "label": "jazz",
+          "cosine_similarity": 0.54224
+        },
+        {
+          "label": "blues",
+          "cosine_similarity": 0.46218
+        },
+        {
+          "label": "electronic",
+          "cosine_similarity": 0.4434
+        },
+        {
+          "label": "hip_hop",
+          "cosine_similarity": 0.43003
+        },
+        {
+          "label": "country",
+          "cosine_similarity": 0.39864
+        },
+        {
+          "label": "funk",
+          "cosine_similarity": 0.39762
+        },
+        {
+          "label": "pop",
+          "cosine_similarity": 0.39113
+        },
+        {
+          "label": "folk",
+          "cosine_similarity": 0.29299
+        },
+        {
+          "label": "classical",
+          "cosine_similarity": 0.16191
+        }
+      ],
+      "audio": "/audio/USUAN1400046.mp3"
+    },
+    {
+      "id": "USUAN1700023",
+      "title": "Metalmania",
+      "artist": "Kevin MacLeod",
+      "source_genre_id": "19",
+      "description": "I was doing some research on metal... today's description is going to involve some participation on your part. Step 1) Google: \"Death Metal English\" the first link should be from invisibleoranges. Step 2) Enjoy!  You're welcome.",
+      "source_url": "https://incompetech.com/music/royalty-free/music.html",
+      "audio_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Metalmania.mp3",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "duration": 190.46,
+      "sha256": "fe6298b6f9fed30870d21edd97d9be4f35de271789e648eee14a3e8472b6ee4a",
+      "configuration": "5db385be183884934d7662e8843ed7867321afccb436aea40e51124ee8bd7bb6",
+      "style_scores": [
+        {
+          "label": "metal",
+          "cosine_similarity": 0.71173
+        },
+        {
+          "label": "rock",
+          "cosine_similarity": 0.58825
+        },
+        {
+          "label": "reggae",
+          "cosine_similarity": 0.41863
+        },
+        {
+          "label": "electronic",
+          "cosine_similarity": 0.37425
+        },
+        {
+          "label": "jazz",
+          "cosine_similarity": 0.34249
+        },
+        {
+          "label": "funk",
+          "cosine_similarity": 0.34075
+        },
+        {
+          "label": "hip_hop",
+          "cosine_similarity": 0.30021
+        },
+        {
+          "label": "blues",
+          "cosine_similarity": 0.25467
+        },
+        {
+          "label": "country",
+          "cosine_similarity": 0.22737
+        },
+        {
+          "label": "pop",
+          "cosine_similarity": 0.19354
+        },
+        {
+          "label": "classical",
+          "cosine_similarity": 0.01328
+        },
+        {
+          "label": "folk",
+          "cosine_similarity": 0.01115
+        }
+      ],
+      "audio": "/audio/USUAN1700023.mp3"
+    },
+    {
+      "id": "USUAN1500002",
+      "title": "Ready Aim Fire",
+      "artist": "Kevin MacLeod",
+      "source_genre_id": "19",
+      "description": "An amped up secret agent or pro wrestler theme with a thick wall of sound and a crazy drummer!",
+      "source_url": "https://incompetech.com/music/royalty-free/music.html",
+      "audio_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Ready%20Aim%20Fire.mp3",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "duration": 216.95,
+      "sha256": "9c733e8227961f989b743d7566a8e6c777ebd8555265d803df740775ab31b9d3",
+      "configuration": "5db385be183884934d7662e8843ed7867321afccb436aea40e51124ee8bd7bb6",
+      "style_scores": [
+        {
+          "label": "metal",
+          "cosine_similarity": 0.7391
+        },
+        {
+          "label": "rock",
+          "cosine_similarity": 0.59727
+        },
+        {
+          "label": "reggae",
+          "cosine_similarity": 0.4174
+        },
+        {
+          "label": "electronic",
+          "cosine_similarity": 0.40268
+        },
+        {
+          "label": "jazz",
+          "cosine_similarity": 0.34124
+        },
+        {
+          "label": "funk",
+          "cosine_similarity": 0.31535
+        },
+        {
+          "label": "hip_hop",
+          "cosine_similarity": 0.27775
+        },
+        {
+          "label": "blues",
+          "cosine_similarity": 0.24641
+        },
+        {
+          "label": "country",
+          "cosine_similarity": 0.2254
+        },
+        {
+          "label": "pop",
+          "cosine_similarity": 0.20003
+        },
+        {
+          "label": "classical",
+          "cosine_similarity": 0.14552
+        },
+        {
+          "label": "folk",
+          "cosine_similarity": 0.05488
+        }
+      ],
+      "audio": "/audio/USUAN1500002.mp3"
+    },
+    {
+      "id": "USUAN1600068",
+      "title": "Too Cool",
+      "artist": "Kevin MacLeod",
+      "source_genre_id": "26",
+      "description": "You know when you watch a vampire movie and then you walk out into the real world, but you're still sort of in the fictional world because it looked like the real world... and that's where you are now. I call this Persistence of Fiction, and it feels awesome! Capture some fiction by playing this track while walking to the bus... er the Vampire Bus! or waiting in line at the Vampire DMV or sorting Vampire Direct Mail Ads or doing some Vampire Macrame.",
+      "source_url": "https://incompetech.com/music/royalty-free/music.html",
+      "audio_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Too%20Cool.mp3",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "duration": 181.58,
+      "sha256": "f1ebb92d48941c8cca461f512cb5322617a1ce632a62ec761dcd01e457702162",
+      "configuration": "5db385be183884934d7662e8843ed7867321afccb436aea40e51124ee8bd7bb6",
+      "style_scores": [
+        {
+          "label": "hip_hop",
+          "cosine_similarity": 0.63405
+        },
+        {
+          "label": "reggae",
+          "cosine_similarity": 0.59493
+        },
+        {
+          "label": "funk",
+          "cosine_similarity": 0.5036
+        },
+        {
+          "label": "jazz",
+          "cosine_similarity": 0.48562
+        },
+        {
+          "label": "rock",
+          "cosine_similarity": 0.461
+        },
+        {
+          "label": "pop",
+          "cosine_similarity": 0.45607
+        },
+        {
+          "label": "electronic",
+          "cosine_similarity": 0.45156
+        },
+        {
+          "label": "metal",
+          "cosine_similarity": 0.45012
+        },
+        {
+          "label": "country",
+          "cosine_similarity": 0.34531
+        },
+        {
+          "label": "blues",
+          "cosine_similarity": 0.32848
+        },
+        {
+          "label": "folk",
+          "cosine_similarity": 0.13165
+        },
+        {
+          "label": "classical",
+          "cosine_similarity": 0.02421
+        }
+      ],
+      "audio": "/audio/USUAN1600068.mp3"
+    },
+    {
+      "id": "USUAN1600032",
+      "title": "Basic Implosion",
+      "artist": "Kevin MacLeod",
+      "source_genre_id": "16",
+      "description": "Upbeat, bright, and super catchy! Just try not to rap to this piece! TRY IT! You can't, can you! I mean... I can, but I've been training to not rap my entire life. It started with me not-rapping in my childhood in the upper midwest. My lack-of-rapping hit a new high while on a high school band trip to Disneyworld, and was again bolstered in a crazy non-rap filled Spring Break in Sault Ste. Marie, Ontario. There's just something about not-rapping and industrial forestry...",
+      "source_url": "https://incompetech.com/music/royalty-free/music.html",
+      "audio_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Basic%20Implosion.mp3",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "duration": 189.54,
+      "sha256": "72f3a5b2086e0452f5f6f3b10c97e4b267f222ed4b9fc777de340efbcfc8f523",
+      "configuration": "5db385be183884934d7662e8843ed7867321afccb436aea40e51124ee8bd7bb6",
+      "style_scores": [
+        {
+          "label": "hip_hop",
+          "cosine_similarity": 0.62107
+        },
+        {
+          "label": "electronic",
+          "cosine_similarity": 0.60193
+        },
+        {
+          "label": "pop",
+          "cosine_similarity": 0.59439
+        },
+        {
+          "label": "reggae",
+          "cosine_similarity": 0.48
+        },
+        {
+          "label": "funk",
+          "cosine_similarity": 0.44188
+        },
+        {
+          "label": "jazz",
+          "cosine_similarity": 0.41856
+        },
+        {
+          "label": "metal",
+          "cosine_similarity": 0.3247
+        },
+        {
+          "label": "rock",
+          "cosine_similarity": 0.3131
+        },
+        {
+          "label": "country",
+          "cosine_similarity": 0.26028
+        },
+        {
+          "label": "blues",
+          "cosine_similarity": 0.20136
+        },
+        {
+          "label": "folk",
+          "cosine_similarity": 0.1668
+        },
+        {
+          "label": "classical",
+          "cosine_similarity": 0.00218
+        }
+      ],
+      "audio": "/audio/USUAN1600032.mp3"
+    },
+    {
+      "id": "USUAN1500040",
+      "title": "Rhinoceros",
+      "artist": "Kevin MacLeod",
+      "source_genre_id": "7",
+      "description": "Semi-8 bit, sort of 1980's synth pop crazy thing! Super energy; Crazy fun. Perfect for: automobile reviews, actions montages, martial arts clips, or anything with fast edits that needs a good pace!",
+      "source_url": "https://incompetech.com/music/royalty-free/music.html",
+      "audio_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Rhinoceros.mp3",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "duration": 203.89,
+      "sha256": "a73fa6059d078700c7d07d0c89343753acdaa368dc78f5c843bc23ec29036fec",
+      "configuration": "5db385be183884934d7662e8843ed7867321afccb436aea40e51124ee8bd7bb6",
+      "style_scores": [
+        {
+          "label": "electronic",
+          "cosine_similarity": 0.59135
+        },
+        {
+          "label": "metal",
+          "cosine_similarity": 0.47185
+        },
+        {
+          "label": "pop",
+          "cosine_similarity": 0.46999
+        },
+        {
+          "label": "funk",
+          "cosine_similarity": 0.46328
+        },
+        {
+          "label": "reggae",
+          "cosine_similarity": 0.46262
+        },
+        {
+          "label": "rock",
+          "cosine_similarity": 0.43868
+        },
+        {
+          "label": "jazz",
+          "cosine_similarity": 0.39634
+        },
+        {
+          "label": "hip_hop",
+          "cosine_similarity": 0.33767
+        },
+        {
+          "label": "country",
+          "cosine_similarity": 0.24497
+        },
+        {
+          "label": "blues",
+          "cosine_similarity": 0.17678
+        },
+        {
+          "label": "classical",
+          "cosine_similarity": 0.1614
+        },
+        {
+          "label": "folk",
+          "cosine_similarity": 0.15973
+        }
+      ],
+      "audio": "/audio/USUAN1500040.mp3"
+    },
+    {
+      "id": "USUAN1100844",
+      "title": "Cipher",
+      "artist": "Kevin MacLeod",
+      "source_genre_id": "7",
+      "description": "I've been told this is R&B, but could be a few other things. It is certainly pretty neat. Warning: Very sticky hook.",
+      "source_url": "https://incompetech.com/music/royalty-free/music.html",
+      "audio_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Cipher2.mp3",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "duration": 231.26,
+      "sha256": "d3d0614535a61d748e2fd8d5117fc4d781022a7624794802a2462d8af3fdd522",
+      "configuration": "5db385be183884934d7662e8843ed7867321afccb436aea40e51124ee8bd7bb6",
+      "style_scores": [
+        {
+          "label": "pop",
+          "cosine_similarity": 0.67294
+        },
+        {
+          "label": "reggae",
+          "cosine_similarity": 0.6424
+        },
+        {
+          "label": "electronic",
+          "cosine_similarity": 0.56841
+        },
+        {
+          "label": "jazz",
+          "cosine_similarity": 0.56766
+        },
+        {
+          "label": "hip_hop",
+          "cosine_similarity": 0.55901
+        },
+        {
+          "label": "country",
+          "cosine_similarity": 0.49739
+        },
+        {
+          "label": "funk",
+          "cosine_similarity": 0.48222
+        },
+        {
+          "label": "rock",
+          "cosine_similarity": 0.46573
+        },
+        {
+          "label": "folk",
+          "cosine_similarity": 0.42588
+        },
+        {
+          "label": "blues",
+          "cosine_similarity": 0.41484
+        },
+        {
+          "label": "classical",
+          "cosine_similarity": 0.30903
+        },
+        {
+          "label": "metal",
+          "cosine_similarity": 0.30751
+        }
+      ],
+      "audio": "/audio/USUAN1100844.mp3"
+    },
+    {
+      "id": "USUAN1100709",
+      "title": "Whiskey on the Mississippi",
+      "artist": "Kevin MacLeod",
+      "source_genre_id": "3",
+      "description": "With a jumping bass and off-beat syncopation, this is straight from Memphis? Beale Street. The Hammond organ and electric guitar play together as longtime friends, while the melody changes hands from guitar to organ to electric piano.",
+      "source_url": "https://incompetech.com/music/royalty-free/music.html",
+      "audio_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Whiskey%20on%20the%20Mississippi.mp3",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "duration": 195.38,
+      "sha256": "60d5bd3b67ac9519e79f9581c53ef3eb59f5fe586f55f135996c491113ca9b28",
+      "configuration": "5db385be183884934d7662e8843ed7867321afccb436aea40e51124ee8bd7bb6",
+      "style_scores": [
+        {
+          "label": "jazz",
+          "cosine_similarity": 0.77122
+        },
+        {
+          "label": "reggae",
+          "cosine_similarity": 0.72466
+        },
+        {
+          "label": "rock",
+          "cosine_similarity": 0.63533
+        },
+        {
+          "label": "funk",
+          "cosine_similarity": 0.61837
+        },
+        {
+          "label": "blues",
+          "cosine_similarity": 0.60535
+        },
+        {
+          "label": "pop",
+          "cosine_similarity": 0.54835
+        },
+        {
+          "label": "country",
+          "cosine_similarity": 0.52159
+        },
+        {
+          "label": "metal",
+          "cosine_similarity": 0.49372
+        },
+        {
+          "label": "hip_hop",
+          "cosine_similarity": 0.48236
+        },
+        {
+          "label": "folk",
+          "cosine_similarity": 0.46545
+        },
+        {
+          "label": "electronic",
+          "cosine_similarity": 0.42429
+        },
+        {
+          "label": "classical",
+          "cosine_similarity": 0.17791
+        }
+      ],
+      "audio": "/audio/USUAN1100709.mp3"
+    },
+    {
+      "id": "USUAN2200002",
+      "title": "Boogie Party",
+      "artist": "Kevin MacLeod",
+      "source_genre_id": "19",
+      "description": "Just your everyday 12 bar blues jam. This one is exhausting to play. No MIDI keyboards were injured during the recording of this piece; darn close, though. This piece was written for a Patreon sponsor's project.",
+      "source_url": "https://incompetech.com/music/royalty-free/music.html",
+      "audio_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Boogie%20Party.mp3",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "duration": 271.75,
+      "sha256": "738c7cf5b142bca6f249f731d1f7c5a5025d17b7a05ba649319b0c512c229643",
+      "configuration": "5db385be183884934d7662e8843ed7867321afccb436aea40e51124ee8bd7bb6",
+      "style_scores": [
+        {
+          "label": "reggae",
+          "cosine_similarity": 0.62632
+        },
+        {
+          "label": "jazz",
+          "cosine_similarity": 0.60042
+        },
+        {
+          "label": "funk",
+          "cosine_similarity": 0.5613
+        },
+        {
+          "label": "rock",
+          "cosine_similarity": 0.55353
+        },
+        {
+          "label": "pop",
+          "cosine_similarity": 0.5039
+        },
+        {
+          "label": "metal",
+          "cosine_similarity": 0.49622
+        },
+        {
+          "label": "blues",
+          "cosine_similarity": 0.43499
+        },
+        {
+          "label": "electronic",
+          "cosine_similarity": 0.43262
+        },
+        {
+          "label": "country",
+          "cosine_similarity": 0.41533
+        },
+        {
+          "label": "hip_hop",
+          "cosine_similarity": 0.40588
+        },
+        {
+          "label": "folk",
+          "cosine_similarity": 0.32684
+        },
+        {
+          "label": "classical",
+          "cosine_similarity": 0.23416
+        }
+      ],
+      "audio": "/audio/USUAN2200002.mp3"
+    },
+    {
+      "id": "USUAN1100359",
+      "title": "Bama Country",
+      "artist": "Kevin MacLeod",
+      "source_genre_id": "24",
+      "description": "Deep South-type country music.",
+      "source_url": "https://incompetech.com/music/royalty-free/music.html",
+      "audio_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Bama%20Country.mp3",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "duration": 211.85,
+      "sha256": "aa9336421148cf25707da80431cb371e5e020ebe5a00dde151977d94839f5bde",
+      "configuration": "5db385be183884934d7662e8843ed7867321afccb436aea40e51124ee8bd7bb6",
+      "style_scores": [
+        {
+          "label": "jazz",
+          "cosine_similarity": 0.69449
+        },
+        {
+          "label": "folk",
+          "cosine_similarity": 0.54518
+        },
+        {
+          "label": "blues",
+          "cosine_similarity": 0.54144
+        },
+        {
+          "label": "reggae",
+          "cosine_similarity": 0.52224
+        },
+        {
+          "label": "rock",
+          "cosine_similarity": 0.49127
+        },
+        {
+          "label": "funk",
+          "cosine_similarity": 0.48298
+        },
+        {
+          "label": "pop",
+          "cosine_similarity": 0.4317
+        },
+        {
+          "label": "country",
+          "cosine_similarity": 0.42758
+        },
+        {
+          "label": "metal",
+          "cosine_similarity": 0.42085
+        },
+        {
+          "label": "hip_hop",
+          "cosine_similarity": 0.41232
+        },
+        {
+          "label": "classical",
+          "cosine_similarity": 0.34458
+        },
+        {
+          "label": "electronic",
+          "cosine_similarity": 0.32219
+        }
+      ],
+      "audio": "/audio/USUAN1100359.mp3"
+    },
+    {
+      "id": "USUAN1400032",
+      "title": "Guts and Bourbon",
+      "artist": "Kevin MacLeod",
+      "source_genre_id": "16",
+      "description": "Country... rural... upbeat...",
+      "source_url": "https://incompetech.com/music/royalty-free/music.html",
+      "audio_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Guts%20and%20Bourbon.mp3",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "duration": 208.8,
+      "sha256": "8cd93a36fb6e1f52ce96eca845597c8b5e86bd2dbfb8759669ba64fdebb4cbfc",
+      "configuration": "5db385be183884934d7662e8843ed7867321afccb436aea40e51124ee8bd7bb6",
+      "style_scores": [
+        {
+          "label": "rock",
+          "cosine_similarity": 0.67388
+        },
+        {
+          "label": "reggae",
+          "cosine_similarity": 0.66235
+        },
+        {
+          "label": "jazz",
+          "cosine_similarity": 0.6622
+        },
+        {
+          "label": "blues",
+          "cosine_similarity": 0.60521
+        },
+        {
+          "label": "metal",
+          "cosine_similarity": 0.56192
+        },
+        {
+          "label": "funk",
+          "cosine_similarity": 0.53158
+        },
+        {
+          "label": "country",
+          "cosine_similarity": 0.50919
+        },
+        {
+          "label": "pop",
+          "cosine_similarity": 0.43458
+        },
+        {
+          "label": "hip_hop",
+          "cosine_similarity": 0.40194
+        },
+        {
+          "label": "folk",
+          "cosine_similarity": 0.37657
+        },
+        {
+          "label": "electronic",
+          "cosine_similarity": 0.35802
+        },
+        {
+          "label": "classical",
+          "cosine_similarity": 0.11916
+        }
+      ],
+      "audio": "/audio/USUAN1400032.mp3"
+    },
+    {
+      "id": "USUAN1400001",
+      "title": "Gonna Start",
+      "artist": "Kevin MacLeod",
+      "source_genre_id": "18",
+      "description": "Grungy sounding early reggae type groove. This piece is also available in a faster 90 beats per minute version.",
+      "source_url": "https://incompetech.com/music/royalty-free/music.html",
+      "audio_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Gonna%20Start.mp3",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "duration": 190.75,
+      "sha256": "e20b8b78865b8185d2f64d31a94480a30b49d4b46bb206cec9c149fe0e206b1d",
+      "configuration": "5db385be183884934d7662e8843ed7867321afccb436aea40e51124ee8bd7bb6",
+      "style_scores": [
+        {
+          "label": "reggae",
+          "cosine_similarity": 0.66135
+        },
+        {
+          "label": "jazz",
+          "cosine_similarity": 0.65517
+        },
+        {
+          "label": "rock",
+          "cosine_similarity": 0.6343
+        },
+        {
+          "label": "blues",
+          "cosine_similarity": 0.56555
+        },
+        {
+          "label": "metal",
+          "cosine_similarity": 0.5636
+        },
+        {
+          "label": "funk",
+          "cosine_similarity": 0.48399
+        },
+        {
+          "label": "electronic",
+          "cosine_similarity": 0.48122
+        },
+        {
+          "label": "pop",
+          "cosine_similarity": 0.43013
+        },
+        {
+          "label": "country",
+          "cosine_similarity": 0.42628
+        },
+        {
+          "label": "hip_hop",
+          "cosine_similarity": 0.39372
+        },
+        {
+          "label": "folk",
+          "cosine_similarity": 0.31891
+        },
+        {
+          "label": "classical",
+          "cosine_similarity": 0.25095
+        }
+      ],
+      "audio": "/audio/USUAN1400001.mp3"
+    },
+    {
+      "id": "USUAN1500019",
+      "title": "Maccary Bay",
+      "artist": "Kevin MacLeod",
+      "source_genre_id": "18",
+      "description": "Modern sort of reggae with a lots of layers! Features the wah-riffic guitar work of Mr. Brett VanDonsel.",
+      "source_url": "https://incompetech.com/music/royalty-free/music.html",
+      "audio_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Maccary%20Bay.mp3",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "duration": 240.07,
+      "sha256": "a9370ec56a66baf4af23f8998b673a1e8dcfa7ca5b67f3d74b4ff6ed5e96af99",
+      "configuration": "5db385be183884934d7662e8843ed7867321afccb436aea40e51124ee8bd7bb6",
+      "style_scores": [
+        {
+          "label": "reggae",
+          "cosine_similarity": 0.71452
+        },
+        {
+          "label": "jazz",
+          "cosine_similarity": 0.6926
+        },
+        {
+          "label": "rock",
+          "cosine_similarity": 0.61057
+        },
+        {
+          "label": "funk",
+          "cosine_similarity": 0.5988
+        },
+        {
+          "label": "hip_hop",
+          "cosine_similarity": 0.54646
+        },
+        {
+          "label": "blues",
+          "cosine_similarity": 0.53912
+        },
+        {
+          "label": "pop",
+          "cosine_similarity": 0.53625
+        },
+        {
+          "label": "metal",
+          "cosine_similarity": 0.50379
+        },
+        {
+          "label": "electronic",
+          "cosine_similarity": 0.48272
+        },
+        {
+          "label": "country",
+          "cosine_similarity": 0.45707
+        },
+        {
+          "label": "folk",
+          "cosine_similarity": 0.31394
+        },
+        {
+          "label": "classical",
+          "cosine_similarity": 0.0948
+        }
+      ],
+      "audio": "/audio/USUAN1500019.mp3"
+    },
+    {
+      "id": "USUAN1100474",
+      "title": "Funkorama",
+      "artist": "Kevin MacLeod",
+      "source_genre_id": "8",
+      "description": "Clean audio mix with an interesting electronic drum kit and odd chord progressions. Nice grooving bass line.",
+      "source_url": "https://incompetech.com/music/royalty-free/music.html",
+      "audio_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Funkorama.mp3",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "duration": 201.46,
+      "sha256": "6be229815d85a0b99382b944d31098b882702c04ac7ad899e44ab7f8ba89b5ad",
+      "configuration": "5db385be183884934d7662e8843ed7867321afccb436aea40e51124ee8bd7bb6",
+      "style_scores": [
+        {
+          "label": "reggae",
+          "cosine_similarity": 0.72784
+        },
+        {
+          "label": "jazz",
+          "cosine_similarity": 0.67467
+        },
+        {
+          "label": "pop",
+          "cosine_similarity": 0.67372
+        },
+        {
+          "label": "funk",
+          "cosine_similarity": 0.66591
+        },
+        {
+          "label": "hip_hop",
+          "cosine_similarity": 0.62932
+        },
+        {
+          "label": "electronic",
+          "cosine_similarity": 0.55376
+        },
+        {
+          "label": "rock",
+          "cosine_similarity": 0.51778
+        },
+        {
+          "label": "blues",
+          "cosine_similarity": 0.47004
+        },
+        {
+          "label": "country",
+          "cosine_similarity": 0.46933
+        },
+        {
+          "label": "metal",
+          "cosine_similarity": 0.37973
+        },
+        {
+          "label": "folk",
+          "cosine_similarity": 0.35317
+        },
+        {
+          "label": "classical",
+          "cosine_similarity": 0.13434
+        }
+      ],
+      "audio": "/audio/USUAN1100474.mp3"
+    },
+    {
+      "id": "USUAN1100763",
+      "title": "Aces High",
+      "artist": "Kevin MacLeod",
+      "source_genre_id": "8",
+      "description": "Like a night out on the Vegas strip, Aces High makes your hips swagger with a playful bass line and staccato electric guitar. An organ plays the main theme, but when the song changes to a minor key, a clavichord plucks out the central melody, before returning to the slippery organ refrain.",
+      "source_url": "https://incompetech.com/music/royalty-free/music.html",
+      "audio_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Aces%20High.mp3",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "duration": 193.02,
+      "sha256": "5448082a286a99c24b114cd751d0db2e0b99dc747a3d3d7f97e7e4f75f646acf",
+      "configuration": "5db385be183884934d7662e8843ed7867321afccb436aea40e51124ee8bd7bb6",
+      "style_scores": [
+        {
+          "label": "reggae",
+          "cosine_similarity": 0.6778
+        },
+        {
+          "label": "funk",
+          "cosine_similarity": 0.67047
+        },
+        {
+          "label": "jazz",
+          "cosine_similarity": 0.6357
+        },
+        {
+          "label": "rock",
+          "cosine_similarity": 0.55586
+        },
+        {
+          "label": "hip_hop",
+          "cosine_similarity": 0.55331
+        },
+        {
+          "label": "pop",
+          "cosine_similarity": 0.52606
+        },
+        {
+          "label": "metal",
+          "cosine_similarity": 0.43996
+        },
+        {
+          "label": "blues",
+          "cosine_similarity": 0.43315
+        },
+        {
+          "label": "electronic",
+          "cosine_similarity": 0.4062
+        },
+        {
+          "label": "country",
+          "cosine_similarity": 0.35316
+        },
+        {
+          "label": "folk",
+          "cosine_similarity": 0.21593
+        },
+        {
+          "label": "classical",
+          "cosine_similarity": 0.00823
+        }
+      ],
+      "audio": "/audio/USUAN1100763.mp3"
+    }
+  ]
+}
