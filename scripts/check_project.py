@@ -15,7 +15,7 @@ from serve import Handler, ThreadingHTTPServer
 
 
 def main():
-    for name in ['serve.py', 'build_catalog.py', 'experiment.py']:
+    for name in ['serve.py']:
         ast.parse((ROOT / name).read_text(encoding='utf-8-sig'))
     data = json.loads((ROOT / 'web/map-data.json').read_text(encoding='utf-8-sig'))
     points = data['points']
@@ -25,22 +25,19 @@ def main():
         assert all(isinstance(p[k], (float, int)) and math.isfinite(p[k]) for k in ['x', 'y'])
         assert re.fullmatch(r'#[0-9a-fA-F]{6}', p['color'])
     assert data['license'] == 'CC BY-SA 4.0'
-    catalog = json.loads((ROOT / 'web/catalog.json').read_text(encoding='utf-8-sig'))
-    assert len({t['id'] for t in catalog['tracks']}) == len(catalog['tracks']) == 24
-    for track in catalog['tracks']:
-        assert len(track['style_scores']) == 12
-        assert {s['label'] for s in track['style_scores']} == set(catalog['prompts'])
-        assert all(-1 <= s['cosine_similarity'] <= 1 for s in track['style_scores'])
     server = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
     client = build_opener(ProxyHandler({}))
     base = f'http://127.0.0.1:{server.server_port}'
     try:
-        for path in ['/', '/map.html', '/map.js', '/map.css', '/map-data.json', '/catalog.json']:
+        for path in ['/', '/map.html', '/map.js', '/map.css', '/map-data.json', '/style.css', '/index.html']:
             with client.open(base + path) as r:
-                assert r.status == 200 and len(r.read()) > 0, path
-        for path in ['/README.md', '/.env', '/.git/config', '/web/../serve.py']:
+                body = r.read()
+                assert r.status == 200 and len(body) > 0, path
+                if path in ['/', '/index.html']:
+                    assert body == (ROOT / 'web/map.html').read_bytes()
+        for path in ['/README.md', '/.env', '/.git/config', '/web/../serve.py', '/catalog.json', '/app.js', '/audio/example.mp3']:
             try:
                 client.open(base + path)
             except HTTPError as e:
@@ -59,7 +56,7 @@ def main():
         server.shutdown()
         server.server_close()
         thread.join()
-    print('PASS: Python syntax, map/catalog integrity, HTTP assets and access boundaries')
+    print('PASS: Python syntax, map integrity, HTTP assets and access boundaries')
 
 
 if __name__ == '__main__':
