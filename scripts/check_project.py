@@ -1,0 +1,66 @@
+"""Offline checks: data integrity, required assets, HTTP access boundaries."""
+import ast
+import json
+import math
+from pathlib import Path
+import re
+import sys
+import threading
+from urllib.request import build_opener, ProxyHandler, Request
+from urllib.error import HTTPError
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+from serve import Handler, ThreadingHTTPServer
+
+
+def main():
+    for name in ['serve.py', 'build_catalog.py', 'experiment.py']:
+        ast.parse((ROOT / name).read_text(encoding='utf-8-sig'))
+    data = json.loads((ROOT / 'web/map-data.json').read_text(encoding='utf-8-sig'))
+    points = data['points']
+    assert len(points) == 5453, 'Update data version and checks deliberately if replacing the snapshot'
+    assert len({p['name'] for p in points}) == len(points)
+    for p in points:
+        assert all(isinstance(p[k], (float, int)) and math.isfinite(p[k]) for k in ['x', 'y'])
+        assert re.fullmatch(r'#[0-9a-fA-F]{6}', p['color'])
+    assert data['license'] == 'CC BY-SA 4.0'
+    catalog = json.loads((ROOT / 'web/catalog.json').read_text(encoding='utf-8-sig'))
+    assert len({t['id'] for t in catalog['tracks']}) == len(catalog['tracks']) == 24
+    for track in catalog['tracks']:
+        assert len(track['style_scores']) == 12
+        assert {s['label'] for s in track['style_scores']} == set(catalog['prompts'])
+        assert all(-1 <= s['cosine_similarity'] <= 1 for s in track['style_scores'])
+    server = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    client = build_opener(ProxyHandler({}))
+    base = f'http://127.0.0.1:{server.server_port}'
+    try:
+        for path in ['/', '/map.html', '/map.js', '/map.css', '/map-data.json', '/catalog.json']:
+            with client.open(base + path) as r:
+                assert r.status == 200 and len(r.read()) > 0, path
+        for path in ['/README.md', '/.env', '/.git/config', '/web/../serve.py']:
+            try:
+                client.open(base + path)
+            except HTTPError as e:
+                assert e.code == 404, path
+            else:
+                raise AssertionError(f'Unexpected public path: {path}')
+        with client.open(Request(base + '/map-data.json', headers={'Range': 'bytes=0-9'})) as r:
+            assert r.status == 206 and len(r.read()) == 10
+        try:
+            client.open(Request(base + '/map-data.json', headers={'Range': 'bytes=999999999-'}))
+        except HTTPError as e:
+            assert e.code == 416
+        else:
+            raise AssertionError('Out-of-range request should fail')
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join()
+    print('PASS: Python syntax, map/catalog integrity, HTTP assets and access boundaries')
+
+
+if __name__ == '__main__':
+    main()

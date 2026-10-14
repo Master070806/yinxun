@@ -13,3 +13,8 @@ outputs/
 *.mp3
 *.ogg
 *.flac
+
+# Local source archives and temporary downloads
+*.zip
+*.part
+*.pending.json

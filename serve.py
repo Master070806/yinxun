@@ -8,7 +8,7 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):self.serve(True)
     def serve(self,body):
         url=self.path.split('?')[0]
-        if url in ['/','/index.html','/style.css','/app.js','/catalog.json']:
+        if url in ['/','/index.html','/style.css','/app.js','/catalog.json','/map.html','/map.css','/map.js','/map-data.json']:
             path=ROOT/'web'/('index.html' if url=='/' else url[1:])
         elif re.fullmatch(r'/audio/[A-Za-z0-9_-]+\.mp3',url):path=ROOT/'data/catalog'/url.rsplit('/',1)[1]
         else:self.send_error(404);return
@@ -38,5 +38,9 @@ class Handler(BaseHTTPRequestHandler):
                         self.wfile.write(chunk);remaining-=len(chunk)
             except (BrokenPipeError,ConnectionResetError,ConnectionAbortedError):pass
 if __name__=='__main__':
-    print('Yinxun: http://127.0.0.1:8765',flush=True)
-    ThreadingHTTPServer(('127.0.0.1',8765),Handler).serve_forever()
+    import argparse
+    parser=argparse.ArgumentParser()
+    parser.add_argument('--port',type=int,default=8765)
+    port=parser.parse_args().port
+    print(f'Yinxun: http://127.0.0.1:{port}',flush=True)
+    ThreadingHTTPServer(('127.0.0.1',port),Handler).serve_forever()
