@@ -3,9 +3,6 @@
 | 内容 | 来源/版本 | 许可与处理 |
 | --- | --- | --- |
 | `web/map-data.json` | [EveryNoise-Watch](https://github.com/AyrtonB/EveryNoise-Watch)，提交26915304e3b99dc70b0c3f85b0e3954289df72f0，5,453行 | 上游[datapackage.json](https://github.com/AyrtonB/EveryNoise-Watch/blob/26915304e3b99dc70b0c3f85b0e3954289df72f0/data/datapackage.json)标注[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)；此转换数据沿用同许可 |
-| `catalog_sources.json` / 24首音乐 | [Incompetech](https://incompetech.com/music/royalty-free/music.html)，Kevin MacLeod | 音频CC BY 4.0，逐曲源地址与许可记录在清单中；音频不入Git |
-| 预训练CLAP | [laion/clap-htsat-unfused](https://huggingface.co/laion/clap-htsat-unfused)，固定revision见代码 | 权重遵循模型发布方许可，不入Git |
-| librosa三个早期示例 | librosa示例库 | 各曲单独许可；Choice含非商业限制，不在24首曲库中 |
 | 网站原始邻居抓取包 | 协作者提供，6,291节点快照 | 本地研究资料，未纳入Git；不以本项目MIT或社区CSV许可替代其来源许可 |
 
 地图署名：原始地图由 Glenn McDonald / Every Noise at Once 制作，社区数据由 Ayrton Bourn 整理。当前转换把 `genre,x,y,hex_colour` 改为JSON对象 `name,x,y,color`，坐标和颜色保持不变。前端另外计算XY近邻和距离，未宣称为原站的邻居算法。数据页保留来源和许可链接。

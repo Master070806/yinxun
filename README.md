@@ -12,7 +12,9 @@ cd yinxun
 python serve.py --port 8780
 ```
 
-打开 **http://127.0.0.1:8780/map.html**。如端口被占用，修改 `--port`。不要直接双击 HTML，页面需要 HTTP 加载 JSON。此服务仅供本地开发，不是生产部署方案。
+打开 **http://127.0.0.1:8780/**。如端口被占用，修改 `--port`。不要直接双击 HTML，页面需要 HTTP 加载 JSON。此服务仅供本地开发，不是生产部署方案。
+
+当前开发基线为无音频地图原型。早期音频与模型尝试已从当前代码移除，可通过 Git 历史查阅；新功能以本页和贡献指南为准。
 
 ## 当前进度 · 2026-10-15
 
@@ -21,7 +23,6 @@ python serve.py --port 8780
 | 5,453 个风格的坐标地图 | 已实现，支持搜索、缩放和平移 |
 | 四选一子图与精确落点 | 已实现，以文字目标代替音频 |
 | XY 点距离、区域最近距离、子图 Hausdorff 对照 | 已实现；Hausdorff 暂不判分 |
-| 24 首音乐与整曲 CLAP 分析 | 保留为早期对照实验 |
 | 网站原始邻居抓取数据 | 已收到并本地统计，尚未接入界面 |
 | 100 首在线题库 | 尚未采集；暂不阻塞无音频玩法 |
 | 用户系统、排行榜、线上服务 | 未实现 |
@@ -35,7 +36,6 @@ python serve.py --port 8780
 - [贡献指南与分支规则](CONTRIBUTING.md)
 - [进度、数据结论与待办](docs/STATUS.md)
 - [第三方数据与许可](DATA_SOURCES.md)
-- [早期听音实验](docs/audio-experiment.md)
 
 开发前在 Issue 中认领一个明确任务，避免两个人同时修改同一模块。功能分支通过 PR 合入 main；不要提交音频、模型、原始网页包、密钥或个人环境信息。
 
@@ -44,11 +44,7 @@ python serve.py --port 8780
 ```text
 web/map.html、map.js、map.css  地图演示
 web/map-data.json             5,453 个风格坐标（CC BY-SA 4.0）
-web/index.html、app.js        早期听音原型
-web/catalog.json             24 首音乐的预计算分数
 serve.py                     本地开发服务
-build_catalog.py             下载与整曲 CLAP 分析
-experiment.py                最初三个样例实验
 scripts/check_project.py     无网络基础检查
 ```
 
@@ -57,7 +53,6 @@ scripts/check_project.py     无网络基础检查
 ```sh
 python scripts/check_project.py
 node --check web/map.js
-node --check web/app.js
 ```
 
 Node 仅用于开发时语法检查，不是试玩所需依赖。GitHub Actions 在 push / PR 时运行上述检查。涉及界面、距离算法或数据变更时，仍需按贡献指南完成对应人工验收，不能仅以 CI 通过代替试玩。

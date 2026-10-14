@@ -15,4 +15,3 @@ jobs:
           node-version: '22'
       - run: python scripts/check_project.py
       - run: node --check web/map.js
-      - run: node --check web/app.js

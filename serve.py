@@ -1,4 +1,4 @@
-"""Local-only preview server; exposes only app assets and catalog audio. Supports seeking."""
+"""Local-only map preview server; exposes only explicitly allowed app assets."""
 from http.server import ThreadingHTTPServer,BaseHTTPRequestHandler
 from pathlib import Path
 import re,mimetypes
@@ -8,9 +8,8 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):self.serve(True)
     def serve(self,body):
         url=self.path.split('?')[0]
-        if url in ['/','/index.html','/style.css','/app.js','/catalog.json','/map.html','/map.css','/map.js','/map-data.json']:
-            path=ROOT/'web'/('index.html' if url=='/' else url[1:])
-        elif re.fullmatch(r'/audio/[A-Za-z0-9_-]+\.mp3',url):path=ROOT/'data/catalog'/url.rsplit('/',1)[1]
+        if url in ['/','/index.html','/style.css','/map.html','/map.css','/map.js','/map-data.json']:
+            path=ROOT/'web'/('map.html' if url in ['/', '/index.html'] else url[1:])
         else:self.send_error(404);return
         if not path.is_file():self.send_error(404);return
         size=path.stat().st_size;start=0;end=size-1;status=200
