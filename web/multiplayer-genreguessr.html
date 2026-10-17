@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fdfcf9">
+  <meta name="description" content="Multiplayer Genreguessr. Invite friends and play together.">
+  <meta name="referrer" content="same-origin">
+  <title>Multiplayer Genreguessr — Cartography &amp; BGMs</title>
+  <link rel="stylesheet" href="/genreguessr.css">
+  <link rel="stylesheet" href="/genre-cluster.css">
+  <link rel="stylesheet" href="/genrerace.css">
+  <link rel="stylesheet" href="/multiplayer.css">
+  <script type="module" src="/multiplayer.js"></script>
+</head>
+<body data-mode="guessr">
+  <div class="page-shell">
+    <header class="site-header"><a href="/">Cartography &amp; BGMs</a></header>
+    <main id="main-content">
+      <div id="connection-banner" class="connection-banner" role="status" hidden><span id="connection-message"></span><button id="retry-connection" class="text-button" type="button">Retry</button><a id="fresh-room" href="/multiplayer-genreguessr" hidden>Create a new room</a></div>
+      <section id="setup" class="page" aria-labelledby="setup-title">
+        <div class="intro"><p class="eyebrow">Multiplayer</p><h1 id="setup-title" tabindex="-1">Genreguessr</h1><p>Find the cluster. Then the genre. Play together.</p></div>
+        <form id="room-form">
+          <div class="name-field"><label for="player-name">Your name</label><input id="player-name" name="name" type="text" maxlength="24" autocomplete="nickname" required placeholder="Name for the scoreboard"></div>
+          <fieldset class="metric-fieldset">
+            <legend class="sr-only">Metric</legend>
+            <div class="metric-options">
+              <label class="metric-option"><input type="radio" name="metric" value="xyrgb" checked><span>XYRGB</span></label>
+              <label class="metric-option"><input type="radio" name="metric" value="graph"><span>Graph distance</span></label>
+              <label class="metric-option"><input type="radio" name="metric" value="kernel"><span>Signed kernel</span></label>
+            </div>
+          </fieldset>
+          <fieldset class="parameters">
+            <legend class="sr-only">Parameters</legend>
+            <div class="parameter-grid">
+              <div class="parameter">
+                <label for="cluster-count">Clusters</label>
+                <div class="range-control"><input id="cluster-count" type="range" min="3" max="10" step="1" value="4"><output for="cluster-count" id="count-value">4</output></div>
+              </div>
+              <div class="parameter metric-parameter" data-for="xyrgb kernel">
+                <label for="cluster-size">Genres per cluster</label>
+                <div class="range-control"><input id="cluster-size" type="range" min="5" max="25" step="1" value="20"><output for="cluster-size" id="size-value">20</output></div>
+              </div>
+              <div class="parameter metric-parameter" data-for="xyrgb">
+                <label for="map-weight">Position / color</label>
+                <div class="range-control"><input id="map-weight" type="range" min="5" max="95" step="5" value="80"><output for="map-weight" id="weight-value">80 / 20</output></div>
+              </div>
+              <div class="parameter metric-parameter" data-for="kernel" hidden>
+                <label for="opposition-weight">Opposition <span class="math-symbol">λ</span></label>
+                <input id="opposition-weight" type="number" min="0.1" max="10" step="0.1" value="1">
+              </div>
+              <div class="parameter metric-parameter" data-for="kernel" hidden>
+                <label for="regularization">Regularization <span class="math-symbol">η</span></label>
+                <input id="regularization" type="number" min="0.01" max="10" step="0.01" value="0.1">
+              </div>
+              <div class="parameter metric-parameter" data-for="xyrgb kernel">
+                <label for="separation">Center separation <span class="math-symbol">ℓ</span></label>
+                <input id="separation" type="number" min="0" max="10" step="0.05" value="0.65">
+              </div>
+              <div class="parameter metric-parameter" data-for="graph" hidden>
+                <label for="graph-separation">Neighborhood separation <span class="math-symbol">m</span></label>
+                <input id="graph-separation" type="number" min="1" max="10" step="1" value="3">
+              </div>
+            </div>
+          </fieldset>
+          <fieldset class="parameters rounds-fieldset">
+            <legend class="sr-only">Multiplayer rounds</legend>
+            <div class="parameter"><label for="rounds">Rounds</label><input id="rounds" type="number" min="1" max="20" step="1" value="5" required></div>
+          </fieldset>
+          <div class="setup-action"><button id="create-room" class="primary-button" type="submit" disabled>Create room →</button><button id="cancel-edit" class="text-button" type="button" hidden>Cancel</button></div>
+          <p id="catalog-caption" class="catalog-note">Loading genres…</p>
+          <p id="setup-message" class="setup-message" role="status" hidden></p>
+        </form>
+        <details class="how-to-play"><summary>How to play</summary><p>Each round has two stages: everyone selects a cluster, then players who chose correctly select a genre. A wrong cluster earns 0. In the second stage, score = 1,000 × (1 − distance / farthest distance), using the chosen metric and the farthest genre in the correct cluster. The target earns 1,000. Everyone readies up between rounds; the highest total wins.</p></details>
+      </section>
+
+      <section id="join" class="page compact-page" aria-labelledby="join-title" hidden>
+        <div class="intro"><p class="eyebrow">You’re invited</p><h1 id="join-title" tabindex="-1">Genreguessr</h1><p id="join-description">Finding the room…</p></div>
+        <p id="join-settings" class="room-summary"></p>
+        <form id="join-form"><div class="name-field"><label for="join-name">Your name</label><input id="join-name" name="name" type="text" maxlength="24" autocomplete="nickname" required placeholder="Name for the scoreboard"></div><div class="setup-action"><button id="join-room" class="primary-button" type="submit" disabled>Join room →</button></div><p id="join-message" class="setup-message" role="status" hidden></p></form>
+        <p class="secondary-action"><a href="/multiplayer-genreguessr">Create your own room</a></p>
+      </section>
+
+      <div id="room-shell" hidden>
+        <div class="room-toolbar"><span id="room-label"></span><button id="leave-room" class="text-button" type="button">Leave room</button></div>
+        <section id="lobby" class="page room-page" aria-labelledby="lobby-title" hidden>
+          <div class="intro"><p class="eyebrow">Multiplayer Genreguessr</p><h1 id="lobby-title" tabindex="-1">Invite your friends</h1><p id="lobby-description">Share the link, then play together.</p></div>
+          <div class="invite-control"><label class="sr-only" for="invite-link">Invitation link</label><input id="invite-link" type="url" readonly><button id="copy-link" class="secondary-button" type="button">Copy link</button></div>
+          <p id="invite-note" class="catalog-note" role="status"></p>
+          <p id="lobby-settings" class="room-summary"></p><p class="edit-settings-action"><button id="edit-settings" class="text-button" type="button" hidden>Edit settings</button></p>
+          <div class="round-action"><button id="start-game" class="primary-button" type="button" disabled>Start game →</button></div>
+          <p id="lobby-waiting" class="waiting-message" role="status"></p>
+        </section>
+
+        <section id="cluster" class="page game-page" aria-labelledby="cluster-title" hidden>
+          <div class="stage-heading"><p id="cluster-progress" class="eyebrow"></p><h1 id="cluster-title" tabindex="-1">Find the cluster</h1></div>
+          <div class="sample-player"><button class="play-link" type="button" aria-label="Play first sample"><span aria-hidden="true">▷</span></button></div>
+          <div id="cluster-grid" class="cluster-grid" aria-label="Choose a cluster"></div>
+          <div class="round-action"><button id="submit-cluster" class="primary-button" type="button" disabled>Select</button></div>
+          <p id="cluster-waiting" class="waiting-message" role="status"></p>
+        </section>
+
+        <section id="genre" class="page game-page" aria-labelledby="genre-title" hidden>
+          <div class="stage-heading"><p id="genre-progress" class="eyebrow"></p><h1 id="genre-title" tabindex="-1">Find the genre</h1></div>
+          <div id="genre-playing"><div class="sample-player"><button class="play-link" type="button" aria-label="Play second sample"><span aria-hidden="true">▷</span></button></div><div class="final-frame"><div id="genre-viewport" class="cluster-viewport" aria-label="Choose a genre"></div></div><div class="round-action"><button id="submit-genre" class="primary-button" type="button" disabled>Select</button></div></div>
+          <p id="genre-waiting" class="waiting-message" role="status"></p>
+        </section>
+
+        <section id="round-result" class="page results-page" aria-labelledby="round-result-title" hidden>
+          <div class="intro"><p id="result-progress" class="eyebrow"></p><h1 id="round-result-title" tabindex="-1">Round results</h1><p>The answer was <span id="target-genre"></span>.</p></div>
+          <div id="round-scoreboard" class="score-table-wrap"></div>
+          <p class="scoring-note">Correct cluster: up to 1,000 points for proximity. Exact target: 1,000. Wrong cluster: 0.</p>
+          <div class="round-action"><button id="ready-next" class="primary-button" type="button">Next round →</button></div>
+          <p id="result-waiting" class="waiting-message" role="status"></p><p class="recovery-settings-action"><button id="recover-settings" class="text-button" type="button" hidden>Adjust settings and retry</button></p>
+        </section>
+
+        <section id="race" class="page game-page" aria-labelledby="race-title" hidden>
+          <div class="stage-heading"><p class="eyebrow">Multiplayer Genrerace</p><h1 id="race-title" tabindex="-1">Find your way</h1></div>
+          <p class="race-goal">Goal <span id="race-goal-name"></span></p>
+          <div class="race-frame"><div id="race-viewport" class="cluster-viewport" aria-label="Choose your next genre"></div></div>
+          <div class="round-action"><button id="submit-move" class="primary-button" type="button" disabled>Select</button></div>
+          <p id="race-note" class="waiting-message"></p>
+          <section class="race-history" aria-labelledby="trace-title"><div class="trace-heading"><h2 id="trace-title">Your route</h2><span id="trace-count"></span></div><ol id="race-trace" aria-label="Visited genres"></ol></section>
+        </section>
+
+        <section id="finished" class="page results-page" aria-labelledby="finished-title" hidden>
+          <div class="intro"><p class="eyebrow">Game finished</p><h1 id="finished-title" tabindex="-1">Final results</h1><p id="winner-message"></p></div>
+          <div id="final-scoreboard" class="score-table-wrap"></div>
+          <div id="all-routes"></div>
+          <p class="secondary-action"><a href="/multiplayer-genreguessr">Create another room →</a></p>
+        </section>
+        <p id="game-message" class="game-message" role="status" hidden></p>
+        <section class="room-players" aria-labelledby="players-title"><div class="players-heading"><h2 id="players-title">Players</h2><span id="player-count"></span></div><ul id="player-list"></ul></section>
+      </div>
+      <p id="game-announcement" class="sr-only" aria-live="polite" aria-atomic="true"></p>
+      <noscript><p class="setup-message">Multiplayer Genreguessr needs JavaScript enabled.</p></noscript>
+    </main>
+    <footer class="site-footer">a game brought by Circles &amp; Basterds.</footer>
+  </div>
+</body>
+</html>

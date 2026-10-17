@@ -1,37 +1,54 @@
-# 进度与技术决策
+# Current status
 
-更新日期：2026-10-15。
+Updated 2026-10-17.
 
-## 已实现
+## Genreguessr
 
-无音频地图采用 2021 年 EveryNoise-Watch CSV 的 5,453 个点。每题四个候选集，每集一个中心加20个XY最近邻；文字目标用于验证流程。第二阶段显示落点距离和目标到所选集合最近距离，附对称 Hausdorff 对照，不把它直接变成游戏得分。
+The English front page links to `/genreguessr`. Arrangement starts a one-way game: choose a cluster, then—only after a correct choice—identify the exact genre. Gameplay keeps the minimal cluster boxes, selection button and anonymous audio control. Genre names are scattered in two dimensions with their original RGB colors; there is no 3D model, dragging, recentering, or stage navigation. Display placement does not represent metric distance.
 
-当前以无音频地图为开发基线；早期听音、CLAP推理、采集脚本及样例分数已从当前版本移除，仅保留Git历史。运行不依赖GPU、音频库或向量数据库。
+The actual engine replaces the curated visual fixtures:
 
-## 已收到、未接入的原始邻居数据
+- A uniform draw selects one of all 6,291 genres before media availability or cluster feasibility is checked. No genre is filtered or silently replaced.
+- The selected XYRGB, neighbor-graph, or signed-kernel metric and its parameters determine real clusters. Players choose 3–10 clusters. Continuous metrics use a chosen 5–25 nearest genres including the center (default 20); graph mode uses complete closed unit balls.
+- Target-conditioned rejection sampling produces a uniform valid center set on success. Exactly one offered cluster contains the target. Failed generation retains the target for retry and does not silently relax the settings.
+- Round one plays the genre map's first sample; the correct cluster unlocks its second sample. Track metadata stays server-side behind an opaque local audio endpoint.
+- In the final round, clicking a genre plays a separate comparison sample and selects that genre. Both clue songs are excluded, including cross-genre duplicates. Select still confirms the answer; the top play control still replays the second clue.
+- Server-owned sessions enforce one-way progression and validate selections. A wrong choice ends the game; completed games reveal the target with a link to its Every Noise genre page. Final guesses also return the selected metric distance, without a fabricated score scale.
 
-协作者提供网站抓取包，其中包含主地图HTML、6,291个详情页快照、邻居列表、边表、矩阵与统计。只读取了数据，没有执行附带脚本。包内记录的HTTP状态均为200；这不等于逐页人工确认抓取正确。
+The parsed catalog is validated against the complete local crawl. It contains 83,881 undirected near edges and 114,896 undirected opposite edges, with both layers preserved on their 32 overlaps. The main map, graph endpoints and sample metadata share the same genre IDs. Raw source files and private caches remain outside public web routes.
 
-独立统计边表得到：
+## Operational limits
 
-- 6,291个节点、123,435条唯一有向边，无自环。
-- 有向边密度0.31194%，无向并集83,881条边。
-- 6,053个节点有20个出向邻居；11个节点没有出向邻居。
-- 约64.09%的有向边存在反向边；关系不能假定天然对称。
-- 从包内同一主地图提取6,291个XY坐标，逐节点取最近20点，与原始邻居比较：平均交集2.08266个，完全一致的节点为0。
+The source crawl must be supplied locally; it is not distributed with the repository. Python 3.11+, NumPy and SciPy are required for gameplay. Signed-kernel construction uses a dense float64 matrix; one full distance matrix uses about 302 MiB. Geometry is cached within the running server.
 
-这个结果说明原始邻居不是展示XY的直接20近邻，不能证明其来源算法，也没有证明任意XYRGB加权距离无法解释它。当前网页仍使用旧版5,453点坐标，不能混用两版索引。原始抓取包未随仓库分发，以上统计尚需补充可分享的复现入口与人工抽查。
+The snapshot has 44 unavailable first entries and 56 unavailable second entries, each missing both its preview URL and track ID. The server supports Every Noise's resolver when a track ID exists, but cannot resolve these empty entries. Other upstream previews can also become unavailable. It never substitutes a later song or rerolls a target because playback fails.
 
-## 下一步任务（尚未认领）
+Graph distance is infinite between disconnected components, and isolated genres remain eligible. Graph cluster sizes vary. Some parameter settings admit no valid cluster set; bounded sampling can also exhaust its attempt limit without proving impossibility.
 
-1. 数据审计：抽查详情页框内链接与边表一致性，确认异常/空邻居和版本；梳理可分发的数据范围。
-2. 数据接口：设计带来源版本的邻居格式，确保所有边端点存在；原始数据通过本地导入，不依赖个人文件路径。
-3. 对照界面：同一目标并列展示原始邻居与XY最近邻，不暗示二者等价。
-4. 距离实验：比较XY、图最短路径及基于不同基础距离的Hausdorff；明确无向化、断连、尺度与判分含义后再选方案。
-5. 玩法验证：先解决标签拥挤、目标泄露的文字测试局限和错误区域的后续体验，再接音频。
+Sessions expire after two hours and are lost when the server restarts. Accounts, global leaderboards, a universal score scale, persistent history, and production hosting are not implemented. Multiplayer room scoreboards use the explicit per-question distance rule described in the README.
 
-100首在线曲库暂缓。Jamendo官方示例Client ID实测返回应用停用；尚未取得项目自己的有效ID，也没有采集100首歌曲。地图实验不需要该凭证。
+See [ENGINE.md](ENGINE.md) for exact formulas, sampler guarantees, local setup and validation commands. Automated tests cover the original guessing engine, sample parsing and playback endpoints, race traversal, directed reachability, session bounds, concurrent duplicate moves, and multiplayer rooms. The earlier full-catalog audit passed for all three 6,291×6,291 geometries, including independently checked neighborhoods and multi-hop races. Missing Genreguessr source clues are marked explicitly with playback disabled; they do not trigger a target substitution.
 
-## 尚未决定
+## Genrerace
 
-正式评分规则、图距离是否用于判分、音源平台、数据发布范围、数据库结构与部署方案。探索图距离不意味着放弃XY；先用证据比较。
+The front-page Genrerace link opens `/genrerace`. Setup includes all 6,291 start and goal genres, independent randomization dice, the three metric choices and their relevant controls. The playing screen contains one cluster, a Select button, and a minimal route history with the move count. The history lists every visited genre in order, including the start and revisits, and marks the current position. Clicking a genre selects it and plays its first available Every Noise sample; Select confirms the move and opens that genre's actual neighborhood. Listening never increments the round count or adds a history entry. The current genre can be heard without moving. The win screen shows only “You win,” the number of moves and the ordered visited route. A start equal to the goal finishes in zero moves.
+
+The race engine uses the full metric space at every step: nearest-k neighborhoods for XYRGB and signed kernel (5–25 genres including the center; default 12), and complete closed unit balls for graph mode. Parameters stay fixed during the race. There are no example clusters, route-based subsets or forced goal appearances. Race sessions share the metric provider and retain only sparse neighborhoods, avoiding a dense matrix per session.
+
+Reachability respects directed nearest-neighbor membership. An unreachable initial pair is reported without rerolling. Legal moves into a region that cannot reach the goal remain available and are marked. The server validates moves, route and count; revision checks prevent duplicate submissions from moving twice. Playback uses the existing bounded anonymous audio proxy, and a playback failure leaves movement available.
+
+A live browser check completed youth orchestra → american romanticism → korean classical performance → chamber ensemble in exactly three moves. It confirmed audio playback without movement, fresh neighborhoods after Select, stopped audio on movement, and the server-derived route on the win screen.
+
+## Multiplayer
+
+Two additional front-page links open multiplayer Genreguessr and Genrerace. Rooms use invite links, separate player credentials, a host-controlled lobby, and shared server state. Genreguessr retains all arrangement settings and adds 1–20 rounds, with barriers between cluster guesses, eligible genre guesses, and result acknowledgments. Incorrect cluster guesses earn zero; final genre scores depend on the chosen metric and accumulate in the room scoreboard. Genrerace fixes a common start and goal, accepts independent legal moves, and freezes all routes on the first winning move. Final results display every route, including players who left.
+
+Room polling restores the same player on refresh. Leaving or host removal releases a pending barrier. Private answers and source metadata are excluded from room snapshots. The server remains loopback-only by default; `--host 0.0.0.0` explicitly enables access from other devices, and invite links use the browser's current host. Public hosting is not provisioned.
+
+Validation: all 142 automated tests pass, including 42 multiplayer tests. Live browser checks completed a three-player, two-round guessing match with distance scores and cumulative standings, and a two-player race with independent routes, refresh recovery, and a shared finish. Lobby settings edits and invite copying were also verified. Failed later-round generation can be retried with adjusted settings while preserving the pending target, scores, and round count.
+
+## Legacy map
+
+`/map.html` remains the earlier 5,453-point EveryNoise-Watch demo, with its own bundled CSV-derived data and XY experiments. It is separate from the 6,291-genre gameplay engine. Its old curated cluster fixtures remain historical assets and do not determine actual games. The original README is preserved below the new English setup section.
+
+Earlier audio-model experiments remain only in Git history. The current implementation does not require GPU models, an embedding database, or the previously proposed 100-song library. Source provenance and license boundaries are recorded in [DATA_SOURCES.md](../DATA_SOURCES.md).

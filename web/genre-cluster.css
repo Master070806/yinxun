@@ -1,0 +1,80 @@
+.cluster-viewport {
+  position: relative;
+  width: 100%;
+  height: 280px;
+  isolation: isolate;
+}
+
+.cluster-viewport.gc-large {
+  height: 430px;
+}
+
+.gc-stage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  visibility: hidden;
+}
+
+.gc-label {
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: max-content;
+  max-width: calc(100% - 20px);
+  margin: 0;
+  padding: 3px 4px;
+  border: 1px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  text-align: center;
+  text-decoration: none;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+button.gc-label {
+  cursor: pointer;
+}
+
+button.gc-label:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.gc-label.gc-listening,
+.gc-label.gc-loading {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.gc-label.gc-loading {
+  text-decoration-style: dotted;
+}
+
+.gc-label.gc-selected {
+  border-color: currentColor;
+}
+
+button.gc-label:focus-visible {
+  outline: 1px dashed currentColor;
+  outline-offset: 2px;
+}
+
+@media (max-width: 540px) {
+  .cluster-viewport {
+    height: 290px;
+  }
+
+  .cluster-viewport.gc-large {
+    height: 390px;
+  }
+}
