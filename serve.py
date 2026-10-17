@@ -1,4 +1,4 @@
-"""Loopback-only Genreguessr API and explicitly allowlisted website assets."""
+"""Loopback-only music game APIs and explicitly allowlisted website assets."""
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 from threading import Lock
@@ -12,14 +12,17 @@ ASSETS = {'/', '/index.html', '/home.css', '/style.css', '/map.html', '/map.css'
           '/map.js', '/map-data.json', '/genreguessr', '/genreguessr/',
           '/genreguessr.html', '/genreguessr.css', '/genreguessr.js',
           '/genre-cluster.js', '/genre-cluster.css',
+          '/genrerace', '/genrerace/', '/genrerace.html', '/genrerace.css', '/genrerace.js',
           '/about', '/about/', '/about.html', '/about.css'}
 ALIASES = {'/': 'index.html', '/genreguessr': 'genreguessr.html',
            '/genreguessr/': 'genreguessr.html',
+           '/genrerace': 'genrerace.html', '/genrerace/': 'genrerace.html',
            '/about': 'about.html', '/about/': 'about.html'}
 
 
 class Handler(BaseHTTPRequestHandler):
     game_service = None
+    race_service = None
     audio_store = None
     initialization_lock = Lock()
 
@@ -34,6 +37,16 @@ class Handler(BaseHTTPRequestHandler):
                 from engine.audio import AudioStore
                 cls.audio_store = AudioStore()
         return cls.game_service, cls.audio_store
+
+    def races(self):
+        service, _ = self.services()
+        cls = type(self)
+        with cls.initialization_lock:
+            if (cls.race_service is None or cls.race_service.catalog is not service.catalog
+                    or cls.race_service.provider is not service.provider):
+                from engine.race import RaceService
+                cls.race_service = RaceService(service.catalog, service.provider)
+            return cls.race_service
 
     def json_response(self, status, payload, body=True):
         data = json.dumps(payload, ensure_ascii=False, allow_nan=False).encode('utf-8')
@@ -66,7 +79,8 @@ class Handler(BaseHTTPRequestHandler):
             return
         path = urlsplit(self.path).path
         match = re.fullmatch(r'/api/games/([A-Za-z0-9_-]{1,64})/(cluster|genre)', path)
-        if path != '/api/games' and not match:
+        race_move = re.fullmatch(r'/api/races/([A-Za-z0-9_-]{1,64})/move', path)
+        if path not in ('/api/games', '/api/races') and not match and not race_move:
             self.send_error(404)
             return
         try:
@@ -80,13 +94,19 @@ class Handler(BaseHTTPRequestHandler):
             self.json_response(400, {'error': 'Send a valid game request.', 'code': 'invalid_request'})
             return
         try:
-            service, _ = self.services()
-            if path == '/api/games':
-                result = service.start(request.get('settings'), retry_id=request.get('retry_id'))
-            elif match[2] == 'cluster':
-                result = service.choose_cluster(match[1], request.get('cluster_id'))
+            if path == '/api/races':
+                result = self.races().start(request.get('start_id'), request.get('goal_id'),
+                                           request.get('settings'))
+            elif race_move:
+                result = self.races().move(race_move[1], request.get('genre_id'), request.get('revision'))
             else:
-                result = service.choose_genre(match[1], request.get('genre_id'))
+                service, _ = self.services()
+                if path == '/api/games':
+                    result = service.start(request.get('settings'), retry_id=request.get('retry_id'))
+                elif match[2] == 'cluster':
+                    result = service.choose_cluster(match[1], request.get('cluster_id'))
+                else:
+                    result = service.choose_genre(match[1], request.get('genre_id'))
             self.json_response(200, result)
         except (BrokenPipeError, ConnectionResetError):
             pass
@@ -137,9 +157,36 @@ class Handler(BaseHTTPRequestHandler):
     def serve(self, body):
         path = urlsplit(self.path).path
         try:
+            race = re.fullmatch(r'/api/races/([A-Za-z0-9_-]{1,64})', path)
+            if race:
+                self.json_response(200, self.races().get(race[1]), body)
+                return
             if path == '/api/status':
                 service, _ = self.services()
                 self.json_response(200, {'ready': True, 'genres': len(service.catalog.genres)}, body)
+                return
+            if path == '/api/genres':
+                service, _ = self.services()
+                self.json_response(200, {'genres': [
+                    {key: genre[key] for key in ('id', 'name', 'color')}
+                    for genre in service.catalog.genres
+                ]}, body)
+                return
+            genre_audio = re.fullmatch(r'/api/genres/([^/]+)/audio', path)
+            if genre_audio:
+                from engine.audio import AudioError
+                from engine.game import GameError
+                if not re.fullmatch(r'[0-9]{1,10}', genre_audio[1]):
+                    raise GameError('Genre not found.', status=404, code='genre_not_found')
+                service, media = self.services()
+                genre_id = int(genre_audio[1])
+                if not any(genre['id'] == genre_id for genre in service.catalog.genres):
+                    raise GameError('Genre not found.', status=404, code='genre_not_found')
+                track = next((sample for sample in service.catalog.samples(genre_id)
+                              if sample.get('preview_url') or sample.get('track_id')), None)
+                if track is None:
+                    raise AudioError()
+                self.send_bytes(media.get(track), 'audio/mpeg', body, anonymous=True)
                 return
             audio = re.fullmatch(r'/api/games/([A-Za-z0-9_-]{1,64})/audio/([12])', path)
             if audio:

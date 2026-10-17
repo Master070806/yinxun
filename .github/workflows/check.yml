@@ -19,3 +19,4 @@ jobs:
       - run: node --check web/map.js
       - run: node --check web/genreguessr.js
       - run: node --check web/genre-cluster.js
+      - run: node --check web/genrerace.js

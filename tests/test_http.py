@@ -120,6 +120,119 @@ class HTTPTests(unittest.TestCase):
             self.assertNotIn(secret, encoded)
         self.assertEqual(len(game["clusters"]), 3)
 
+    def test_genre_catalog_exposes_only_actual_ids_names_and_colors(self):
+        self.service.catalog.genres[5].update(
+            id=91, x=123, y=456, track_id="private-track", source_url="private-source")
+        with patch.object(self.service.catalog, "samples") as samples:
+            status, headers, body = self.request("GET", "/api/genres")
+            self.assertEqual(status, 200)
+            expected = {"genres": [
+                {"id": 91 if i == 5 else i, "name": f"genre {i}", "color": "#123456"}
+                for i in range(6)
+            ]}
+            self.assertEqual(json.loads(body), expected)
+            self.assertEqual(headers["Cache-Control"], "no-store")
+            status, head_headers, head_body = self.request("HEAD", "/api/genres")
+            self.assertEqual(status, 200)
+            self.assertEqual(head_body, b"")
+            self.assertEqual(head_headers["Content-Length"], str(len(body)))
+            samples.assert_not_called()
+        self.assertEqual(self.service._sessions, {})
+
+    def test_genre_audio_uses_catalog_id_and_first_available_source_sample(self):
+        self.service.catalog.genres[5]["id"] = 91
+        available = {"position": 2, "preview_url": None,
+                     "track_id": "private-track-91-2", "source_url": "private-source"}
+        with patch.object(self.service.catalog, "samples", return_value=[
+                {"position": 1, "preview_url": None, "track_id": None},
+                available,
+                {"position": 3, "preview_url": "https://private.invalid/later"},
+        ]) as samples:
+            status, _, body = self.request("GET", "/api/genres/91/audio?url=https://unrelated.invalid/")
+            self.assertEqual(status, 200)
+            self.assertEqual(body, self.audio.data)
+            samples.assert_called_once_with(91)
+            self.assertEqual(self.audio.tracks, [available])
+        self.assertEqual(self.service._sessions, {})
+
+    def test_genre_audio_ranges_head_and_anonymous_headers(self):
+        endpoint = "/api/genres/5/audio"
+        status, headers, body = self.request("GET", endpoint)
+        self.assertEqual(status, 200)
+        self.assertEqual(body, self.audio.data)
+        self.assertEqual(self.audio.tracks[-1]["track_id"], "private-track-5-1")
+        self.assertEqual(headers["Content-Type"], "audio/mpeg")
+        self.assertEqual(headers["Content-Disposition"], 'inline; filename="sample.mp3"')
+        self.assertEqual(headers["Cache-Control"], "no-store")
+        self.assertEqual(headers["Accept-Ranges"], "bytes")
+        self.assertNotIn("private", str(headers))
+        self.assertNotIn("Location", headers)
+        status, headers, body = self.request("GET", endpoint, headers={"Range": "bytes=2-6"})
+        self.assertEqual(status, 206)
+        self.assertEqual(body, self.audio.data[2:7])
+        self.assertEqual(headers["Content-Range"], f"bytes 2-6/{len(self.audio.data)}")
+        status, headers, body = self.request("HEAD", endpoint, headers={"Range": "bytes=2-6"})
+        self.assertEqual(status, 206)
+        self.assertEqual(headers["Content-Length"], "5")
+        self.assertEqual(body, b"")
+        status, headers, body = self.request("HEAD", endpoint)
+        self.assertEqual(status, 200)
+        self.assertEqual(headers["Content-Length"], str(len(self.audio.data)))
+        self.assertEqual(body, b"")
+        status, headers, body = self.request("GET", endpoint, headers={"Range": "bytes=9999-"})
+        self.assertEqual(status, 416)
+        self.assertEqual(headers["Content-Range"], f"bytes */{len(self.audio.data)}")
+
+    def test_unknown_and_malformed_genre_ids_have_safe_404_errors(self):
+        with patch.object(self.service.catalog, "samples") as samples:
+            for genre_id in ("6", "9999999999", "99999999999", "-1", "true", "0.5", "no-such-genre"):
+                with self.subTest(genre_id=genre_id):
+                    status, headers, body = self.request("GET", f"/api/genres/{genre_id}/audio")
+                    self.assertEqual(status, 404)
+                    self.assertEqual(json.loads(body)["code"], "genre_not_found")
+                    self.assertEqual(headers["Cache-Control"], "no-store")
+                    self.assertNotIn("private", body.decode())
+            status, _, body = self.request("HEAD", "/api/genres/6/audio")
+            self.assertEqual(status, 404)
+            self.assertEqual(body, b"")
+            samples.assert_not_called()
+        self.assertEqual(self.audio.tracks, [])
+
+    def test_genre_without_samples_returns_safe_502_without_replacing_genre(self):
+        for samples in ([], [{"position": 1, "preview_url": None, "track_id": None}]):
+            with self.subTest(samples=samples):
+                with patch.object(self.service.catalog, "samples", return_value=samples) as lookup:
+                    status, headers, body = self.request("GET", "/api/genres/5/audio")
+                    self.assertEqual(status, 502)
+                    self.assertEqual(json.loads(body)["code"], "audio_unavailable")
+                    self.assertEqual(headers["Cache-Control"], "no-store")
+                    for secret in ("private", "track_id", "source_url", "genre 5", '"target"'):
+                        self.assertNotIn(secret, body.decode())
+                    lookup.assert_called_once_with(5)
+                    status, _, body = self.request("HEAD", "/api/genres/5/audio")
+                    self.assertEqual(status, 502)
+                    self.assertEqual(body, b"")
+        self.assertEqual(self.audio.tracks, [])
+        self.assertEqual(self.service._sessions, {})
+
+    def test_genre_audio_failures_hide_metadata_and_do_not_skip_failed_track(self):
+        for error, expected_status in ((AudioError(), 502),
+                                       (RuntimeError("private source URL and track name"), 503)):
+            self.audio.error = error
+            status, _, body = self.request("GET", "/api/genres/5/audio")
+            self.assertEqual(status, expected_status)
+            self.assertNotIn("private", body.decode())
+            self.assertNotIn("track_id", body.decode())
+            self.assertNotIn("source_url", body.decode())
+        self.audio.error = None
+        self.assertEqual(self.request("GET", "/api/genres/5/audio")[0], 200)
+        self.assertTrue(all(track["position"] == 1 for track in self.audio.tracks))
+        with patch.object(self.service.catalog, "samples", side_effect=OSError("private source path")):
+            status, _, body = self.request("GET", "/api/genres/5/audio")
+            self.assertEqual(status, 503)
+            self.assertEqual(json.loads(body)["code"], "service_unavailable")
+            self.assertNotIn("private", body.decode())
+
     def test_http_round_transitions_types_and_replay_guards(self):
         game = self.start()
         base = f"/api/games/{game['id']}"

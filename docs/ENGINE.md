@@ -1,6 +1,8 @@
-# Genreguessr engine
+# Game engines
 
 Genreguessr draws one target uniformly from all **6,291 genres** in the cached Every Noise snapshot. Round one asks for its cluster; only a correct choice unlocks the second sample and exact-genre round. A wrong cluster or final answer ends the game. Targets, cluster centers, correct-choice identifiers, and track metadata stay on the server until an answer is revealed.
+
+Genrerace traverses neighborhoods on the same full catalog and metric provider. Every new center uses the selected geometry on all 6,291 genres; there is no sampled subspace, route-dependent pruning, or injected goal.
 
 ## Local setup
 
@@ -34,10 +36,11 @@ The builder checks that the map, genre index, and neighborhood records describe 
 | Geometry | `engine/metrics.py` | Parameterized distance matrices, nearest-k clusters, graph balls, reverse cluster membership |
 | Sampling | `engine/sampling.py` | Uniform valid center sets conditional on the fixed target, with a bounded attempt budget |
 | Game sessions | `engine/game.py` | Uniform target draw, parameter validation, one-way rounds, answer validation, expiry and retry |
+| Race sessions | `engine/race.py` | Fixed geometry, directed reachability, legal moves, revision checks, ordered routes and expiry |
 | Anonymous audio | `engine/audio.py` | Resolve original preview URLs, proxy bounded audio responses, remove usual ID3 title/artist tags |
 | Delivery and presentation | `serve.py`, `web/genreguessr.js`, `web/genre-cluster.js` | Local HTTP interface, minimal round UI, randomized label placement |
 
-Display positions are independent random placements. They never enter a distance calculation. Genre labels retain their original map RGB colors. Cluster members and box order are shuffled, and centers are not marked.
+Display positions are independent random placements. They never enter a distance calculation. Genre labels retain their original map RGB colors. In Genreguessr, cluster members and box order are shuffled, and centers are not marked. Genrerace marks its current genre with a dotted border.
 
 ## Geometry
 
@@ -86,14 +89,38 @@ In the final round, clicking a genre selects it and plays a comparison sample fr
 
 Sessions live in memory, expire after two hours, and disappear when the server restarts. The second sample and final-answer endpoint require a correct round-one answer. Invalid selections do not consume a round. A completed game reveals the target with a link to its canonical Every Noise genre page; final guesses also return their distance in the chosen metric. The link is included only when the answer is revealed, for either a correct or incorrect guess. There is no invented score conversion, account system, or leaderboard.
 
+## Genrerace traversal
+
+Let `V` be the full catalog. Fix the chosen metric and parameters for a race. For XYRGB and signed kernel, `C(v)` is the nearest-k cluster over all `V`, including `v`, with `5 ≤ k ≤ 25` and default `k=12`. Graph mode uses the complete closed unit ball `C(v)=B₁(v)`. No cluster-separation parameter is needed for a walk.
+
+The legal movement relation is `v → w` exactly when `w ∈ C(v)` and `w ≠ v`. Although the underlying distances are symmetric, nearest-k membership need not be. Reachability therefore uses reverse breadth-first search on this directed relation. A start outside the goal's reverse-reachable set returns `422 unreachable_goal`; it does not reroll a genre or alter the settings. Legal moves into a region from which the goal cannot be reached remain available and return `goal_reachable: false`. Graph mode has the usual connected-component reachability.
+
+The server owns the start, goal, immutable settings, cluster rows, route and count. Each accepted move appends one genre, recenters the cluster and increments both `moves` and `revision`. Self-moves and nonmembers are rejected. A request with an old revision returns `409 stale_move` with the current public state, so a retried request cannot count twice. Reaching the goal wins; equal start and goal wins with zero moves.
+
+Race sessions hold sparse immutable neighborhood rows, never a dense matrix. Recent full metric matrices are shared through the existing bounded provider cache. Sessions expire after two hours, with at most 128 races retained; expired and then completed sessions are reclaimed before refusing new ones. Restarting the server clears sessions.
+
+| Endpoint | Purpose |
+| --- | --- |
+| `POST /api/races` | Start with `start_id`, `goal_id` and `settings` |
+| `GET /api/races/<id>` | Read public state; `HEAD` is also supported |
+| `POST /api/races/<id>/move` | Move with `genre_id` and the current `revision` |
+| `GET /api/genres` | All 6,291 names, IDs and RGB colors |
+| `GET /api/genres/<id>/audio` | First available numbered sample through the anonymous audio proxy |
+
+The minimal browser interface renders the returned current cluster, with the goal above it and the visited route and move count below. Clicking a genre selects it and plays audio; only Select submits a move. An unavailable sample leaves movement possible. The gameplay history and win screen use the server's route and count, preserving revisits.
+
 ## Validation
 
 ```sh
 .venv/bin/python -m unittest discover -s tests -v
 .venv/bin/python scripts/check_project.py
 .venv/bin/python scripts/build_catalog.py
+.venv/bin/python scripts/check_race_catalog.py
 node --check web/genreguessr.js
+node --check web/genrerace.js
 node --check web/genre-cluster.js
 ```
 
 The unit tests cover metric formulas, overlapping signed edges, graph/Hausdorff edge cases, nearest-neighbor ties, equal sampler proposal mass, unique target membership, full-catalog target selection, state gates, privacy boundaries, and target-preserving retries. Project checks exercise local assets and access boundaries. Catalog validation needs the local source crawl; unit fixtures do not. Actual audio playback requires a separate online check.
+
+Race tests cover full-universe traversal, directed reachability, legal traps, invalid moves, fixed goals and settings, concurrent duplicate submissions, zero-move wins, expiry and session bounds. The optional full-crawl audit checks all three 6,291×6,291 matrices, independently verifies sampled nearest-neighbor rows and every graph unit ball, then walks real multi-hop routes through the race service.

@@ -25,9 +25,19 @@ The snapshot has 44 unavailable first entries and 56 unavailable second entries,
 
 Graph distance is infinite between disconnected components, and isolated genres remain eligible. Graph cluster sizes vary. Some parameter settings admit no valid cluster set; bounded sampling can also exhaust its attempt limit without proving impossibility.
 
-Sessions expire after two hours and are lost when the server restarts. Accounts, leaderboards, a universal score scale, persistent history, Genrerace gameplay, and production hosting are not implemented.
+Sessions expire after two hours and are lost when the server restarts. Accounts, leaderboards, a universal score scale, persistent history, and production hosting are not implemented.
 
-See [ENGINE.md](ENGINE.md) for exact formulas, sampler guarantees, local setup and validation commands. Unit coverage includes metric identities, graph/Hausdorff edge cases, sampler probability, target coverage, progression, hidden-answer metadata and retained-target retries. The suite passes 67 tests, including lazy source parsing, duplicate-song exclusion and final-round comparison access. Live browser checks confirmed clue and candidate playback, switching between songs, generated clusters and the round transitions. Missing source samples are marked explicitly with playback disabled; they do not trigger a target substitution.
+See [ENGINE.md](ENGINE.md) for exact formulas, sampler guarantees, local setup and validation commands. The suite passes 100 tests, covering the original guessing engine, sample parsing and playback endpoints, plus race traversal, directed reachability, session bounds and concurrent duplicate moves. The full-catalog audit passes for all three 6,291×6,291 geometries, including independently checked neighborhoods and multi-hop races. Missing Genreguessr source clues are marked explicitly with playback disabled; they do not trigger a target substitution.
+
+## Genrerace
+
+The front-page Genrerace link opens `/genrerace`. Setup includes all 6,291 start and goal genres, independent randomization dice, the three metric choices and their relevant controls. The playing screen contains one cluster, a Select button, and a minimal route history with the move count. The history lists every visited genre in order, including the start and revisits, and marks the current position. Clicking a genre selects it and plays its first available Every Noise sample; Select confirms the move and opens that genre's actual neighborhood. Listening never increments the round count or adds a history entry. The current genre can be heard without moving. The win screen shows only “You win,” the number of moves and the ordered visited route. A start equal to the goal finishes in zero moves.
+
+The race engine uses the full metric space at every step: nearest-k neighborhoods for XYRGB and signed kernel (5–25 genres including the center; default 12), and complete closed unit balls for graph mode. Parameters stay fixed during the race. There are no example clusters, route-based subsets or forced goal appearances. Race sessions share the metric provider and retain only sparse neighborhoods, avoiding a dense matrix per session.
+
+Reachability respects directed nearest-neighbor membership. An unreachable initial pair is reported without rerolling. Legal moves into a region that cannot reach the goal remain available and are marked. The server validates moves, route and count; revision checks prevent duplicate submissions from moving twice. Playback uses the existing bounded anonymous audio proxy, and a playback failure leaves movement available.
+
+A live browser check completed youth orchestra → american romanticism → korean classical performance → chamber ensemble in exactly three moves. It confirmed audio playback without movement, fresh neighborhoods after Select, stopped audio on movement, and the server-derived route on the win screen.
 
 ## Legacy map
 

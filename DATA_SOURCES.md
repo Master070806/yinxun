@@ -1,6 +1,6 @@
-# Third-party sources — Genreguessr engine
+# Third-party sources — gameplay engines
 
-The live Genreguessr engine uses one consistent **6,291-genre Every Noise snapshot** from the locally imported crawl, checked on 2026-10-14. It does not combine the legacy 5,453-row community CSV with the newer graph.
+Both live engines use one consistent **6,291-genre Every Noise snapshot** from the locally imported crawl, checked on 2026-10-14. They do not combine the legacy 5,453-row community CSV with the newer graph.
 
 | Engine material | Original source | Import and use |
 | --- | --- | --- |
@@ -22,6 +22,8 @@ neighborhoods.json SHA-256:
 ```
 
 Every imported genre page is also checked against its crawl-record SHA-256. The parsed catalog records the source URLs, crawl-check interval, and sample element positions. See [ENGINE.md](docs/ENGINE.md) for the local import command and directory layout.
+
+Genrerace uses this complete catalog for every metric and neighborhood, as well as names, colors and the first available numbered sample of a clicked genre. Neither audio availability nor route history removes genres from its metric space.
 
 The original map is by Glenn McDonald / Every Noise at Once. Raw pages, graph data, private catalog caches and audio are not committed or redistributed by this change. The repository's MIT license and the legacy community CSV's CC BY-SA declaration do not grant rights to this separate website crawl or its recordings. Third-party material retains its original rights.
 

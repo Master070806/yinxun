@@ -4,7 +4,7 @@ A collection of games about listening and exploring musical genres, brought by *
 
 **Genreguessr** is a two-round listening game built on [Every Noise at Once](https://everynoise.com/). It uses a consistent local snapshot of **6,291 genres**, with their map coordinates, colors, musical neighborhoods, contrasting neighborhoods, and song samples. Three selectable metrics determine what it means for genres to be close.
 
-The website includes the front page, Genreguessr, and an About page. Genrerace is currently a placeholder. The interface uses randomly scattered genre names in their original RGB colors; their positions on the game screen do not represent metric distance.
+**Genrerace** is a route-finding game on the same complete metric space: choose a start and goal, listen to nearby genres, and move through their neighborhoods until you reach the goal. Both games share the catalog and metric engine. The interface uses randomly scattered genre names in their original RGB colors; their positions on the game screen do not represent metric distance.
 
 ## Gameplay
 
@@ -14,6 +14,15 @@ The website includes the front page, Genreguessr, and an About page. Genrerace i
 4. **Discover the answer.** A wrong guess ends the game. Both correct and incorrect final outcomes reveal the target with a link to its Every Noise page. Start a new game to play again.
 
 Listening to a candidate does not submit an answer. Only one sample plays at a time. The clues are exactly the map's numbered `item1` and `item2` samples, rather than the separate artist-list or playlist order. Missing or unavailable audio does not silently replace a clue or reroll the target.
+
+## Genrerace
+
+1. Choose any start and goal from all **6,291 genres**, or use either dice button for an independent uniform draw.
+2. Choose the metric and its parameters. XYRGB and signed kernel use **5–25 nearest genres including the current genre**, defaulting to 12. Graph mode uses the complete closed unit ball.
+3. Click a genre to hear its first available numbered sample. **Select** moves there and opens its neighborhood, computed against the entire catalog. The goal stays visible above the cluster; the visited route and move count appear below. Listening alone never counts as a move.
+4. Reach the goal to win. The result shows your ordered route and number of moves. Starting at the goal wins in zero moves.
+
+Settings remain fixed throughout a race. Nearest-neighbor membership can be one-way even with a symmetric metric, so the engine checks reachability on the directed movement graph. An unreachable initial goal is reported without changing either genre or the parameters. Every legal neighbor remains available; a move that makes the goal unreachable is allowed and marked. Audio availability never filters the neighborhoods.
 
 ## Three ways to measure closeness
 
@@ -116,7 +125,7 @@ For another location, set `EVERYNOISE_DATA_DIR` to that directory. Then build th
 .venv/bin/python serve.py --port 8780
 ```
 
-Open [Cartography & BGMs](http://127.0.0.1:8780/) or [Genreguessr](http://127.0.0.1:8780/genreguessr). The server binds only to `127.0.0.1`. Audio playback needs an internet connection and an available upstream preview.
+Open [Cartography & BGMs](http://127.0.0.1:8780/), [Genreguessr](http://127.0.0.1:8780/genreguessr), or [Genrerace](http://127.0.0.1:8780/genrerace). The server binds only to `127.0.0.1`. Audio playback needs an internet connection and an available upstream preview.
 
 The first geometry calculation can take a moment, especially for signed kernel. One full 6,291-by-6,291 float64 matrix uses about **302 MiB**, and kernel construction needs additional working memory. Recent geometries are cached. Game sessions expire after two hours and disappear when the server restarts.
 
@@ -128,6 +137,7 @@ The first geometry calculation can take a moment, especially for signed kernel. 
 | `engine/metrics.py` | XYRGB, graph and signed-kernel distances; cluster construction |
 | `engine/sampling.py` | Target-conditioned cluster sampling |
 | `engine/game.py` | Target selection, round progression, comparison songs and answer validation |
+| `engine/race.py` | Full-catalog traversal, directed reachability, fixed parameters, route and move validation |
 | `engine/audio.py` | Bounded anonymous audio proxy and standard ID3 metadata removal |
 | `serve.py` | Local API and explicitly allowed website assets |
 | `web/` | Minimal English interface and genre-label layouts |
@@ -141,16 +151,19 @@ Answers, source track metadata and correct-cluster identifiers stay on the serve
 .venv/bin/python -m unittest discover -s tests -v
 .venv/bin/python scripts/check_project.py
 node --check web/genreguessr.js
+node --check web/genrerace.js
 node --check web/genre-cluster.js
 node --check web/map.js
 ```
 
 The tests use small fixtures and do not require the full crawl or online audio. Actual playback and complete-catalog generation are checked separately. GitHub Actions runs the automated checks on pushes and pull requests.
 
+With the complete local crawl, run `.venv/bin/python scripts/check_race_catalog.py` to audit all three metrics on all 6,291 genres, compare neighborhoods with independent calculations, and verify multi-move races using genres beyond the legacy map's IDs.
+
 ## Sources, scope and license
 
 Genre data and samples originate from **Glenn McDonald / Every Noise at Once**. Source pages are checked against their crawl hashes. Raw crawl files, private catalog caches and audio recordings are not committed. Third-party data and recordings retain their own rights; the code's [MIT license](LICENSE) does not relicense them. See [source provenance](DATA_SOURCES.md).
 
-The earlier 5,453-point map remains at `/map.html` as a separate legacy demo. Its community CSV and curated visual fixtures do not determine Genreguessr games. Accounts, leaderboards, persistent history, Genrerace gameplay and production hosting are not implemented.
+The earlier 5,453-point map remains at `/map.html` as a separate legacy demo. Its community CSV and curated visual fixtures do not determine either game. Accounts, leaderboards, persistent history and production hosting are not implemented.
 
 Further reading: [engine details](docs/ENGINE.md), [current status](docs/STATUS.md), and [contributing](CONTRIBUTING.md).

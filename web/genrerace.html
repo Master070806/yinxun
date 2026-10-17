@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fdfcf9">
+  <meta name="description" content="Genrerace. Find a route between two genres.">
+  <title>Genrerace — Cartography &amp; BGMs</title>
+  <link rel="stylesheet" href="/genreguessr.css">
+  <link rel="stylesheet" href="/genre-cluster.css">
+  <link rel="stylesheet" href="/genrerace.css">
+  <script type="module" src="/genrerace.js"></script>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="site-header"><a href="/">Cartography &amp; BGMs</a></header>
+    <main id="main-content">
+      <section id="setup" class="page" aria-labelledby="setup-title">
+        <div class="intro">
+          <h1 id="setup-title" tabindex="-1">Genrerace</h1>
+          <p>Find a route between two genres.</p>
+        </div>
+        <form id="race-form">
+          <fieldset class="endpoints">
+            <legend class="sr-only">Your route</legend>
+            <div class="endpoint">
+              <label for="start-genre">Start</label>
+              <div class="endpoint-control">
+                <input id="start-genre" name="start" type="text" list="genre-options" value="ambient" autocomplete="off" spellcheck="false" required>
+                <button class="randomize-genre" type="button" data-input="start-genre" aria-label="Randomize start" title="Randomize start" disabled>
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"></rect><g><circle cx="8" cy="8" r="1.3"></circle><circle cx="16" cy="8" r="1.3"></circle><circle cx="12" cy="12" r="1.3"></circle><circle cx="8" cy="16" r="1.3"></circle><circle cx="16" cy="16" r="1.3"></circle></g></svg>
+                </button>
+              </div>
+            </div>
+            <div class="endpoint">
+              <label for="goal-genre">Goal</label>
+              <div class="endpoint-control">
+                <input id="goal-genre" name="goal" type="text" list="genre-options" value="indie rock" autocomplete="off" spellcheck="false" required>
+                <button class="randomize-genre" type="button" data-input="goal-genre" aria-label="Randomize goal" title="Randomize goal" disabled>
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"></rect><g><circle cx="8" cy="8" r="1.3"></circle><circle cx="16" cy="8" r="1.3"></circle><circle cx="12" cy="12" r="1.3"></circle><circle cx="8" cy="16" r="1.3"></circle><circle cx="16" cy="16" r="1.3"></circle></g></svg>
+                </button>
+              </div>
+            </div>
+            <datalist id="genre-options"></datalist>
+            <p id="randomization-status" class="sr-only" role="status"></p>
+          </fieldset>
+          <fieldset class="metric-fieldset">
+            <legend class="sr-only">Metric</legend>
+            <div class="metric-options">
+              <label class="metric-option"><input type="radio" name="metric" value="xyrgb" checked><span>XYRGB</span></label>
+              <label class="metric-option"><input type="radio" name="metric" value="graph"><span>Graph distance</span></label>
+              <label class="metric-option"><input type="radio" name="metric" value="kernel"><span>Signed kernel</span></label>
+            </div>
+          </fieldset>
+          <fieldset class="parameters">
+            <legend class="sr-only">Cluster parameters</legend>
+            <div class="parameter-grid">
+              <div class="parameter metric-parameter" data-for="xyrgb kernel">
+                <label for="cluster-size">Genres per cluster</label>
+                <div class="range-control"><input id="cluster-size" type="range" min="5" max="25" step="1" value="12"><output for="cluster-size" id="size-value">12</output></div>
+              </div>
+              <div class="parameter metric-parameter" data-for="graph" hidden>
+                <span class="parameter-label">Neighborhood radius</span>
+                <span class="fixed-value">1</span>
+              </div>
+              <div class="parameter metric-parameter" data-for="xyrgb">
+                <label for="map-weight">Position / color</label>
+                <div class="range-control"><input id="map-weight" type="range" min="5" max="95" step="5" value="80"><output for="map-weight" id="weight-value">80 / 20</output></div>
+              </div>
+              <div class="parameter metric-parameter" data-for="kernel" hidden>
+                <label for="opposition-weight">Opposition <span class="math-symbol">λ</span></label>
+                <input id="opposition-weight" type="number" min="0.1" max="10" step="0.1" value="1">
+              </div>
+              <div class="parameter metric-parameter" data-for="kernel" hidden>
+                <label for="regularization">Regularization <span class="math-symbol">η</span></label>
+                <input id="regularization" type="number" min="0.01" max="10" step="0.01" value="0.1">
+              </div>
+            </div>
+          </fieldset>
+          <div class="setup-action"><button id="start-race" class="primary-button" type="submit" disabled>Start race →</button></div>
+          <p id="catalog-caption" class="catalog-note">Loading genres…</p>
+          <p id="setup-message" class="setup-message" role="status" hidden></p>
+        </form>
+      </section>
+
+      <section id="race" class="page" aria-labelledby="race-title" hidden>
+        <h1 id="race-title" class="sr-only" tabindex="-1">Genrerace</h1>
+        <p class="race-goal">Goal <span id="race-goal-name"></span></p>
+        <div class="race-frame"><div id="race-viewport" class="cluster-viewport" aria-label="Choose your next genre"></div></div>
+        <div class="round-action"><button id="confirm-move" class="primary-button" type="button" disabled>Select</button></div>
+        <p id="race-message" class="game-message" role="status" hidden></p>
+        <section class="race-history" aria-labelledby="trace-title">
+          <div class="trace-heading"><h2 id="trace-title">Route</h2><span id="trace-count"></span></div>
+          <ol id="race-trace" aria-label="Visited genres"></ol>
+        </section>
+        <p id="race-announcement" class="sr-only" aria-live="polite" aria-atomic="true"></p>
+      </section>
+
+      <section id="win" class="page" aria-labelledby="win-title" hidden>
+        <h1 id="win-title" tabindex="-1">You win</h1>
+        <p id="round-count"></p>
+        <ol id="visited-route" aria-label="Visited genres"></ol>
+      </section>
+      <noscript><p class="setup-message">Genrerace needs JavaScript enabled.</p></noscript>
+    </main>
+    <footer class="site-footer">a game brought by Circles &amp; Basterds.</footer>
+  </div>
+</body>
+</html>
