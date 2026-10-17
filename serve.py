@@ -2,6 +2,7 @@
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 from threading import Lock
+from time import monotonic
 from urllib.parse import parse_qs, urlsplit
 import json
 import mimetypes
@@ -111,6 +112,7 @@ class Handler(BaseHTTPRequestHandler):
         host = self.headers.get('Host', '')
         if (self.headers.get('Sec-Fetch-Site') == 'cross-site' or
                 (origin and origin not in ('http://' + host, 'https://' + host))):
+            self.discard_request_body()
             self.json_response(403, {'error': 'This request must come from the game.', 'code': 'invalid_origin'})
             return
         path = urlsplit(self.path).path
@@ -119,11 +121,13 @@ class Handler(BaseHTTPRequestHandler):
         room_action = re.fullmatch(
             r'/api/rooms/([A-Za-z0-9_-]{1,64})/(join|configure|start|cluster|genre|ready|move|leave|remove)', path)
         if path not in ('/api/games', '/api/races', '/api/rooms') and not match and not race_move and not room_action:
+            self.discard_request_body()
             self.send_error(404)
             return
         try:
             length = int(self.headers.get('Content-Length', '0'))
             if self.headers.get_content_type() != 'application/json' or not 0 < length <= 16384:
+                self.discard_request_body()
                 raise ValueError()
             request = json.loads(self.rfile.read(length), parse_constant=lambda _: None)
             if not isinstance(request, dict):
@@ -158,6 +162,27 @@ class Handler(BaseHTTPRequestHandler):
             pass
         except Exception as error:
             self.api_error(error)
+
+    def discard_request_body(self):
+        # Closing over unread input can reset the connection on Windows before
+        # the client receives our error. Bound both the bytes and waiting time.
+        try:
+            length = min(max(int(self.headers.get('Content-Length', '0')), 0), 65536)
+        except ValueError:
+            return
+        previous_timeout = self.connection.gettimeout()
+        deadline = monotonic() + 0.5
+        try:
+            while length and (remaining := deadline - monotonic()) > 0:
+                self.connection.settimeout(remaining)
+                chunk = self.rfile.read1(min(length, 8192))
+                if not chunk:
+                    break
+                length -= len(chunk)
+        except OSError:
+            pass
+        finally:
+            self.connection.settimeout(previous_timeout)
 
     def do_HEAD(self):
         self.serve(False)

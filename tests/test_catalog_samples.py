@@ -47,7 +47,7 @@ class CatalogSampleTests(unittest.TestCase):
                          "checked_at_utc": "2026-10-14T17:00:00+00:00", "neighbors": []})
             index_entries.append(f'<div id=item{i + 1} style="color:#123456;left:{i}px;top:{i}px">'
                                  f'{genre["name"]}<a href="{genre["path"]}">»</a></div>')
-        (self.data / "index.html").write_text("".join(index_entries))
+        (self.data / "index.html").write_text("".join(index_entries), encoding="utf-8")
         (self.data / "genres.json").write_text(json.dumps(genres))
         (self.data / "neighborhoods.json").write_text(json.dumps(rows))
 
