@@ -24,6 +24,21 @@ Listening to a candidate does not submit an answer. Only one sample plays at a t
 
 Settings remain fixed throughout a race. Nearest-neighbor membership can be one-way even with a symmetric metric, so the engine checks reachability on the directed movement graph. An unreachable initial goal is reported without changing either genre or the parameters. Every legal neighbor remains available; a move that makes the goal unreachable is allowed and marked. Audio availability never filters the neighborhoods.
 
+## Multiplayer
+
+The front page also links to **Multiplayer Genreguessr** and **Multiplayer Genrerace**. Create a room, enter a name, and copy its invite link to friends. Each room supports 2–16 players. The host can edit settings in the lobby, then starts once everyone has joined; new players cannot join a game already in progress. Refreshing the same tab restores that player's seat. A player can leave, and the host can remove someone whose browser has closed. Removing a player releases their pending selection; leaving as host transfers control to another active player.
+
+**Multiplayer Genreguessr** retains every single-player arrangement control and adds **1–20 rounds**. Everyone hears the same clues and sees the same clusters. Each round has two stages:
+
+1. Everyone confirms a cluster. The second stage starts only after all active players have selected. A wrong cluster earns zero points and waits for the next round.
+2. Players who chose correctly hear the second clue and confirm a genre. The answer and scores are revealed together after all eligible players submit. Everyone selects Next round to continue, or Finish after the final round.
+
+Genre points use the selected metric. If $d$ is the target-to-guess distance and $D$ is the largest finite target distance among the correct cluster's genres, the score is $\operatorname{round}(1000\max(0,1-d/D))$. The exact target earns 1,000 points; an infinite distance earns zero. If $D=0$, a zero-distance guess earns 1,000 points. For example, at half the cluster's maximum distance, a guess earns 500 points. This is a room scoring rule normalized to each question, not a universal measure of musical similarity. Scores accumulate over the chosen number of rounds. Generation retries retain the same hidden target. If a later question cannot be generated, the host can adjust the arrangement and retry that target without losing scores or changing the number of rounds; settings otherwise stay fixed during play.
+
+**Multiplayer Genrerace** gives every player the host's chosen starting genre, goal and metric settings. Each player explores independently. The first goal-reaching move accepted by the server ends the race atomically: later moves are rejected, and everyone sees the winner and every player's complete ordered route and move count. Starting at the goal is a shared zero-move win. Players see other routes only after the race ends.
+
+Rooms synchronize with short polling. The server validates every selection, scores answers, and resolves concurrent moves; browser state cannot award points or choose a winner. Answers, private session IDs, and track metadata stay on the server until the appropriate reveal. Invite links contain a room ID, while each player's separate credential stays in their tab's session storage. Audio credentials are omitted from access logs. Rooms and credentials are temporary and are lost when the server restarts.
+
 ## Three ways to measure closeness
 
 | Metric | What it compares | Candidate cluster |
@@ -127,6 +142,14 @@ For another location, set `EVERYNOISE_DATA_DIR` to that directory. Then build th
 
 Open [Cartography & BGMs](http://127.0.0.1:8780/), [Genreguessr](http://127.0.0.1:8780/genreguessr), or [Genrerace](http://127.0.0.1:8780/genrerace). The server binds only to `127.0.0.1`. Audio playback needs an internet connection and an available upstream preview.
 
+For friends on the **same network**, opt into a network listener:
+
+```sh
+.venv/bin/python serve.py --host 0.0.0.0 --port 8780
+```
+
+Open the game using the host computer's LAN address (for example, `http://192.168.1.10:8780`, with your actual address), then create a room and copy the invite. A `localhost` or `127.0.0.1` invite only works on the host computer. Internet play requires a shared reachable server or HTTPS reverse proxy; this repository does not provision public hosting. All players must connect to the same running Python process because room state is held in memory.
+
 The first geometry calculation can take a moment, especially for signed kernel. One full 6,291-by-6,291 float64 matrix uses about **302 MiB**, and kernel construction needs additional working memory. Recent geometries are cached. Game sessions expire after two hours and disappear when the server restarts.
 
 ## Engine structure
@@ -138,6 +161,7 @@ The first geometry calculation can take a moment, especially for signed kernel. 
 | `engine/sampling.py` | Target-conditioned cluster sampling |
 | `engine/game.py` | Target selection, round progression, comparison songs and answer validation |
 | `engine/race.py` | Full-catalog traversal, directed reachability, fixed parameters, route and move validation |
+| `engine/multiplayer.py` | Invite rooms, player authentication, shared stages, scores and atomic race finishes |
 | `engine/audio.py` | Bounded anonymous audio proxy and standard ID3 metadata removal |
 | `serve.py` | Local API and explicitly allowed website assets |
 | `web/` | Minimal English interface and genre-label layouts |
@@ -152,6 +176,7 @@ Answers, source track metadata and correct-cluster identifiers stay on the serve
 .venv/bin/python scripts/check_project.py
 node --check web/genreguessr.js
 node --check web/genrerace.js
+node --check web/multiplayer.js
 node --check web/genre-cluster.js
 node --check web/map.js
 ```

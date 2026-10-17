@@ -25,9 +25,9 @@ The snapshot has 44 unavailable first entries and 56 unavailable second entries,
 
 Graph distance is infinite between disconnected components, and isolated genres remain eligible. Graph cluster sizes vary. Some parameter settings admit no valid cluster set; bounded sampling can also exhaust its attempt limit without proving impossibility.
 
-Sessions expire after two hours and are lost when the server restarts. Accounts, leaderboards, a universal score scale, persistent history, and production hosting are not implemented.
+Sessions expire after two hours and are lost when the server restarts. Accounts, global leaderboards, a universal score scale, persistent history, and production hosting are not implemented. Multiplayer room scoreboards use the explicit per-question distance rule described in the README.
 
-See [ENGINE.md](ENGINE.md) for exact formulas, sampler guarantees, local setup and validation commands. The suite passes 100 tests, covering the original guessing engine, sample parsing and playback endpoints, plus race traversal, directed reachability, session bounds and concurrent duplicate moves. The full-catalog audit passes for all three 6,291×6,291 geometries, including independently checked neighborhoods and multi-hop races. Missing Genreguessr source clues are marked explicitly with playback disabled; they do not trigger a target substitution.
+See [ENGINE.md](ENGINE.md) for exact formulas, sampler guarantees, local setup and validation commands. Automated tests cover the original guessing engine, sample parsing and playback endpoints, race traversal, directed reachability, session bounds, concurrent duplicate moves, and multiplayer rooms. The earlier full-catalog audit passed for all three 6,291×6,291 geometries, including independently checked neighborhoods and multi-hop races. Missing Genreguessr source clues are marked explicitly with playback disabled; they do not trigger a target substitution.
 
 ## Genrerace
 
@@ -38,6 +38,14 @@ The race engine uses the full metric space at every step: nearest-k neighborhood
 Reachability respects directed nearest-neighbor membership. An unreachable initial pair is reported without rerolling. Legal moves into a region that cannot reach the goal remain available and are marked. The server validates moves, route and count; revision checks prevent duplicate submissions from moving twice. Playback uses the existing bounded anonymous audio proxy, and a playback failure leaves movement available.
 
 A live browser check completed youth orchestra → american romanticism → korean classical performance → chamber ensemble in exactly three moves. It confirmed audio playback without movement, fresh neighborhoods after Select, stopped audio on movement, and the server-derived route on the win screen.
+
+## Multiplayer
+
+Two additional front-page links open multiplayer Genreguessr and Genrerace. Rooms use invite links, separate player credentials, a host-controlled lobby, and shared server state. Genreguessr retains all arrangement settings and adds 1–20 rounds, with barriers between cluster guesses, eligible genre guesses, and result acknowledgments. Incorrect cluster guesses earn zero; final genre scores depend on the chosen metric and accumulate in the room scoreboard. Genrerace fixes a common start and goal, accepts independent legal moves, and freezes all routes on the first winning move. Final results display every route, including players who left.
+
+Room polling restores the same player on refresh. Leaving or host removal releases a pending barrier. Private answers and source metadata are excluded from room snapshots. The server remains loopback-only by default; `--host 0.0.0.0` explicitly enables access from other devices, and invite links use the browser's current host. Public hosting is not provisioned.
+
+Validation: all 142 automated tests pass, including 42 multiplayer tests. Live browser checks completed a three-player, two-round guessing match with distance scores and cumulative standings, and a two-player race with independent routes, refresh recovery, and a shared finish. Lobby settings edits and invite copying were also verified. Failed later-round generation can be retried with adjusted settings while preserving the pending target, scores, and round count.
 
 ## Legacy map
 

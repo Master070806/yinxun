@@ -1,8 +1,8 @@
-"""Loopback-only music game APIs and explicitly allowlisted website assets."""
+"""Music game APIs and explicitly allowlisted website assets."""
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 from threading import Lock
-from urllib.parse import urlsplit
+from urllib.parse import parse_qs, urlsplit
 import json
 import mimetypes
 import re
@@ -13,16 +13,24 @@ ASSETS = {'/', '/index.html', '/home.css', '/style.css', '/map.html', '/map.css'
           '/genreguessr.html', '/genreguessr.css', '/genreguessr.js',
           '/genre-cluster.js', '/genre-cluster.css',
           '/genrerace', '/genrerace/', '/genrerace.html', '/genrerace.css', '/genrerace.js',
+          '/multiplayer-genreguessr', '/multiplayer-genreguessr/', '/multiplayer-genreguessr.html',
+          '/multiplayer-genrerace', '/multiplayer-genrerace/', '/multiplayer-genrerace.html',
+          '/multiplayer.js', '/multiplayer.css',
           '/about', '/about/', '/about.html', '/about.css'}
 ALIASES = {'/': 'index.html', '/genreguessr': 'genreguessr.html',
            '/genreguessr/': 'genreguessr.html',
            '/genrerace': 'genrerace.html', '/genrerace/': 'genrerace.html',
+           '/multiplayer-genreguessr': 'multiplayer-genreguessr.html',
+           '/multiplayer-genreguessr/': 'multiplayer-genreguessr.html',
+           '/multiplayer-genrerace': 'multiplayer-genrerace.html',
+           '/multiplayer-genrerace/': 'multiplayer-genrerace.html',
            '/about': 'about.html', '/about/': 'about.html'}
 
 
 class Handler(BaseHTTPRequestHandler):
     game_service = None
     race_service = None
+    multiplayer_service = None
     audio_store = None
     initialization_lock = Lock()
 
@@ -48,6 +56,33 @@ class Handler(BaseHTTPRequestHandler):
                 cls.race_service = RaceService(service.catalog, service.provider)
             return cls.race_service
 
+    def rooms(self):
+        service, _ = self.services()
+        races = self.races()
+        cls = type(self)
+        with cls.initialization_lock:
+            if (cls.multiplayer_service is None or
+                    cls.multiplayer_service.catalog is not service.catalog or
+                    cls.multiplayer_service.provider is not service.provider):
+                from engine.multiplayer import MultiplayerService
+                cls.multiplayer_service = MultiplayerService(service, races)
+            return cls.multiplayer_service
+
+    def player_token(self, *, audio=False):
+        authorization = self.headers.get('Authorization', '')
+        if authorization.startswith('Bearer '):
+            return authorization[7:]
+        if authorization:
+            return 'invalid-authorization'
+        if audio:
+            return parse_qs(urlsplit(self.path).query).get('token', [None])[0]
+        return None
+
+    def log_request(self, code='-', size='-'):
+        # Audio elements need a query credential; never write it to access logs.
+        self.log_message('"%s %s %s" %s %s', self.command,
+                         urlsplit(self.path).path, self.request_version, str(code), str(size))
+
     def json_response(self, status, payload, body=True):
         data = json.dumps(payload, ensure_ascii=False, allow_nan=False).encode('utf-8')
         self.send_response(status)
@@ -71,16 +106,19 @@ class Handler(BaseHTTPRequestHandler):
                                      'code': 'service_unavailable'}, body)
 
     def do_POST(self):
-        # The local browser is the only writer; reject cross-site submissions.
+        # Allow same-host HTTP or HTTPS (including a TLS reverse proxy).
         origin = self.headers.get('Origin')
+        host = self.headers.get('Host', '')
         if (self.headers.get('Sec-Fetch-Site') == 'cross-site' or
-                (origin and origin != 'http://' + self.headers.get('Host', ''))):
+                (origin and origin not in ('http://' + host, 'https://' + host))):
             self.json_response(403, {'error': 'This request must come from the game.', 'code': 'invalid_origin'})
             return
         path = urlsplit(self.path).path
         match = re.fullmatch(r'/api/games/([A-Za-z0-9_-]{1,64})/(cluster|genre)', path)
         race_move = re.fullmatch(r'/api/races/([A-Za-z0-9_-]{1,64})/move', path)
-        if path not in ('/api/games', '/api/races') and not match and not race_move:
+        room_action = re.fullmatch(
+            r'/api/rooms/([A-Za-z0-9_-]{1,64})/(join|configure|start|cluster|genre|ready|move|leave|remove)', path)
+        if path not in ('/api/games', '/api/races', '/api/rooms') and not match and not race_move and not room_action:
             self.send_error(404)
             return
         try:
@@ -94,7 +132,15 @@ class Handler(BaseHTTPRequestHandler):
             self.json_response(400, {'error': 'Send a valid game request.', 'code': 'invalid_request'})
             return
         try:
-            if path == '/api/races':
+            if path == '/api/rooms':
+                result = self.rooms().create(request)
+            elif room_action:
+                if room_action[2] == 'join':
+                    result = self.rooms().join(room_action[1], request)
+                else:
+                    result = self.rooms().action(room_action[1], self.player_token(),
+                                                room_action[2], request)
+            elif path == '/api/races':
                 result = self.races().start(request.get('start_id'), request.get('goal_id'),
                                            request.get('settings'))
             elif race_move:
@@ -144,6 +190,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header('Content-Type', content_type)
         self.send_header('Content-Length', str(end - start + 1))
         self.send_header('Accept-Ranges', 'bytes')
+        self.send_header('Referrer-Policy', 'no-referrer')
         self.send_header('Cache-Control', 'no-store' if anonymous else 'no-cache')
         self.send_header('X-Content-Type-Options', 'nosniff')
         if anonymous:
@@ -157,6 +204,20 @@ class Handler(BaseHTTPRequestHandler):
     def serve(self, body):
         path = urlsplit(self.path).path
         try:
+            room = re.fullmatch(r'/api/rooms/([A-Za-z0-9_-]{1,64})', path)
+            if room:
+                self.json_response(200, self.rooms().get(room[1], self.player_token()), body)
+                return
+            room_audio = re.fullmatch(
+                r'/api/rooms/([A-Za-z0-9_-]{1,64})/audio/(\d{1,2})/(clue|candidate)/(\d{1,10})', path)
+            if room_audio:
+                kind = ('clue' + room_audio[4]) if room_audio[3] == 'clue' else 'candidate'
+                track = self.rooms().audio_source(room_audio[1], self.player_token(audio=True),
+                                                 int(room_audio[2]), kind,
+                                                 int(room_audio[4]) if kind == 'candidate' else None)
+                _, media = self.services()
+                self.send_bytes(media.get(track), 'audio/mpeg', body, anonymous=True)
+                return
             race = re.fullmatch(r'/api/races/([A-Za-z0-9_-]{1,64})', path)
             if race:
                 self.json_response(200, self.races().get(race[1]), body)
@@ -219,6 +280,10 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--port', type=int, default=8780)
-    port = parser.parse_args().port
-    print(f'Yinxun: http://127.0.0.1:{port}', flush=True)
-    ThreadingHTTPServer(('127.0.0.1', port), Handler).serve_forever()
+    parser.add_argument('--host', default='127.0.0.1',
+                        help='Bind address; use 0.0.0.0 to allow multiplayer on your network.')
+    args = parser.parse_args()
+    print(f'Yinxun: http://{args.host}:{args.port}', flush=True)
+    if args.host == '0.0.0.0':
+        print('Invite friends using this computer\'s LAN IP in the browser URL.', flush=True)
+    ThreadingHTTPServer((args.host, args.port), Handler).serve_forever()

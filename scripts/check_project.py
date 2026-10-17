@@ -34,7 +34,10 @@ def main():
         for path in ['/', '/home.css', '/map.html', '/map.js', '/map.css', '/map-data.json', '/style.css', '/index.html',
                      '/genreguessr', '/genreguessr/', '/genreguessr.html', '/genreguessr.css', '/genreguessr.js',
                      '/genre-cluster.js', '/genre-cluster.css', '/about', '/about/', '/about.html', '/about.css',
-                     '/genrerace', '/genrerace/', '/genrerace.html', '/genrerace.css', '/genrerace.js']:
+                     '/genrerace', '/genrerace/', '/genrerace.html', '/genrerace.css', '/genrerace.js',
+                     '/multiplayer-genreguessr', '/multiplayer-genreguessr/', '/multiplayer-genreguessr.html',
+                     '/multiplayer-genrerace', '/multiplayer-genrerace/', '/multiplayer-genrerace.html',
+                     '/multiplayer.js', '/multiplayer.css']:
             with client.open(base + path) as r:
                 body = r.read()
                 assert r.status == 200 and len(body) > 0, path
@@ -46,6 +49,9 @@ def main():
                     assert body == (ROOT / 'web/about.html').read_bytes()
                 if path in ['/genrerace', '/genrerace/', '/genrerace.html']:
                     assert body == (ROOT / 'web/genrerace.html').read_bytes()
+                for mode in ('genreguessr', 'genrerace'):
+                    if path in [f'/multiplayer-{mode}', f'/multiplayer-{mode}/', f'/multiplayer-{mode}.html']:
+                        assert body == (ROOT / f'web/multiplayer-{mode}.html').read_bytes()
         for path in ['/README.md', '/.env', '/.git/config', '/web/../serve.py', '/catalog.json', '/app.js', '/audio/example.mp3', '/genreguessr-demo.json', '/.cache/genreguessr/catalog.json', '/engine/game.py']:
             try:
                 client.open(base + path)
