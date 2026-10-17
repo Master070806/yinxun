@@ -1,45 +1,177 @@
-"""Local-only map preview server; exposes only explicitly allowed app assets."""
-from http.server import ThreadingHTTPServer,BaseHTTPRequestHandler
+"""Loopback-only Genreguessr API and explicitly allowlisted website assets."""
+from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
-import re,mimetypes
-ROOT=Path(__file__).resolve().parent
+from threading import Lock
+from urllib.parse import urlsplit
+import json
+import mimetypes
+import re
+
+ROOT = Path(__file__).resolve().parent
+ASSETS = {'/', '/index.html', '/home.css', '/style.css', '/map.html', '/map.css',
+          '/map.js', '/map-data.json', '/genreguessr', '/genreguessr/',
+          '/genreguessr.html', '/genreguessr.css', '/genreguessr.js',
+          '/genre-cluster.js', '/genre-cluster.css',
+          '/about', '/about/', '/about.html', '/about.css'}
+ALIASES = {'/': 'index.html', '/genreguessr': 'genreguessr.html',
+           '/genreguessr/': 'genreguessr.html',
+           '/about': 'about.html', '/about/': 'about.html'}
+
+
 class Handler(BaseHTTPRequestHandler):
-    def do_HEAD(self):self.serve(False)
-    def do_GET(self):self.serve(True)
-    def serve(self,body):
-        url=self.path.split('?')[0]
-        if url in ['/','/index.html','/style.css','/map.html','/map.css','/map.js','/map-data.json']:
-            path=ROOT/'web'/('map.html' if url in ['/', '/index.html'] else url[1:])
-        else:self.send_error(404);return
-        if not path.is_file():self.send_error(404);return
-        size=path.stat().st_size;start=0;end=size-1;status=200
-        value=self.headers.get('Range')
-        if value:
-            m=re.fullmatch(r'bytes=(\d*)-(\d*)',value)
-            if not m or not any(m.groups()):self.send_error(416);return
-            if m[1]:start=int(m[1]);end=min(int(m[2]) if m[2] else end,end)
-            else:start=max(0,size-int(m[2]))
-            if start>end or start>=size:self.send_response(416);self.send_header('Content-Range',f'bytes */{size}');self.end_headers();return
-            status=206
+    game_service = None
+    audio_store = None
+    initialization_lock = Lock()
+
+    def services(self):
+        cls = type(self)
+        with cls.initialization_lock:
+            if cls.game_service is None:
+                from engine.catalog import Catalog
+                from engine.game import GameService
+                cls.game_service = GameService(Catalog())
+            if cls.audio_store is None:
+                from engine.audio import AudioStore
+                cls.audio_store = AudioStore()
+        return cls.game_service, cls.audio_store
+
+    def json_response(self, status, payload, body=True):
+        data = json.dumps(payload, ensure_ascii=False, allow_nan=False).encode('utf-8')
         self.send_response(status)
-        self.send_header('Content-Type',mimetypes.guess_type(path)[0] or 'application/octet-stream')
-        self.send_header('Content-Length',str(end-start+1));self.send_header('Accept-Ranges','bytes')
-        self.send_header('Cache-Control','no-cache');self.send_header('X-Content-Type-Options','nosniff')
-        if status==206:self.send_header('Content-Range',f'bytes {start}-{end}/{size}')
+        self.send_header('Content-Type', 'application/json; charset=utf-8')
+        self.send_header('Content-Length', str(len(data)))
+        self.send_header('Cache-Control', 'no-store')
+        self.send_header('X-Content-Type-Options', 'nosniff')
         self.end_headers()
         if body:
-            try:
-                with path.open('rb') as f:
-                    f.seek(start);remaining=end-start+1
-                    while remaining:
-                        chunk=f.read(min(65536,remaining))
-                        if not chunk:break
-                        self.wfile.write(chunk);remaining-=len(chunk)
-            except (BrokenPipeError,ConnectionResetError,ConnectionAbortedError):pass
-if __name__=='__main__':
+            self.wfile.write(data)
+
+    def api_error(self, error, body=True):
+        # Only deliberately public exceptions may cross the HTTP boundary.
+        from engine.audio import AudioError
+        from engine.game import GameError
+        if isinstance(error, (GameError, AudioError)):
+            self.json_response(error.status, error.payload, body)
+        else:
+            self.log_error('Game service failed: %s', type(error).__name__)
+            self.json_response(503, {'error': 'The game service is unavailable. Please try again.',
+                                     'code': 'service_unavailable'}, body)
+
+    def do_POST(self):
+        # The local browser is the only writer; reject cross-site submissions.
+        origin = self.headers.get('Origin')
+        if (self.headers.get('Sec-Fetch-Site') == 'cross-site' or
+                (origin and origin != 'http://' + self.headers.get('Host', ''))):
+            self.json_response(403, {'error': 'This request must come from the game.', 'code': 'invalid_origin'})
+            return
+        path = urlsplit(self.path).path
+        match = re.fullmatch(r'/api/games/([A-Za-z0-9_-]{1,64})/(cluster|genre)', path)
+        if path != '/api/games' and not match:
+            self.send_error(404)
+            return
+        try:
+            length = int(self.headers.get('Content-Length', '0'))
+            if self.headers.get_content_type() != 'application/json' or not 0 < length <= 16384:
+                raise ValueError()
+            request = json.loads(self.rfile.read(length), parse_constant=lambda _: None)
+            if not isinstance(request, dict):
+                raise ValueError()
+        except (ValueError, UnicodeError):
+            self.json_response(400, {'error': 'Send a valid game request.', 'code': 'invalid_request'})
+            return
+        try:
+            service, _ = self.services()
+            if path == '/api/games':
+                result = service.start(request.get('settings'), retry_id=request.get('retry_id'))
+            elif match[2] == 'cluster':
+                result = service.choose_cluster(match[1], request.get('cluster_id'))
+            else:
+                result = service.choose_genre(match[1], request.get('genre_id'))
+            self.json_response(200, result)
+        except (BrokenPipeError, ConnectionResetError):
+            pass
+        except Exception as error:
+            self.api_error(error)
+
+    def do_HEAD(self):
+        self.serve(False)
+
+    def do_GET(self):
+        self.serve(True)
+
+    def send_bytes(self, data, content_type, body, *, anonymous=False):
+        size = len(data)
+        start, end, status = 0, size - 1, 200
+        value = self.headers.get('Range')
+        if value:
+            match = re.fullmatch(r'bytes=(\d*)-(\d*)', value)
+            valid = match and any(match.groups())
+            if valid:
+                if match[1]:
+                    start = int(match[1])
+                    end = min(int(match[2]) if match[2] else end, end)
+                else:
+                    start = max(0, size - int(match[2]))
+                valid = start <= end and start < size
+            if not valid:
+                self.send_response(416)
+                self.send_header('Content-Range', f'bytes */{size}')
+                self.send_header('Content-Length', '0')
+                self.end_headers()
+                return
+            status = 206
+        self.send_response(status)
+        self.send_header('Content-Type', content_type)
+        self.send_header('Content-Length', str(end - start + 1))
+        self.send_header('Accept-Ranges', 'bytes')
+        self.send_header('Cache-Control', 'no-store' if anonymous else 'no-cache')
+        self.send_header('X-Content-Type-Options', 'nosniff')
+        if anonymous:
+            self.send_header('Content-Disposition', 'inline; filename="sample.mp3"')
+        if status == 206:
+            self.send_header('Content-Range', f'bytes {start}-{end}/{size}')
+        self.end_headers()
+        if body:
+            self.wfile.write(data[start:end + 1])
+
+    def serve(self, body):
+        path = urlsplit(self.path).path
+        try:
+            if path == '/api/status':
+                service, _ = self.services()
+                self.json_response(200, {'ready': True, 'genres': len(service.catalog.genres)}, body)
+                return
+            audio = re.fullmatch(r'/api/games/([A-Za-z0-9_-]{1,64})/audio/([12])', path)
+            if audio:
+                service, media = self.services()
+                track = service.audio_source(audio[1], int(audio[2]))
+                self.send_bytes(media.get(track), 'audio/mpeg', body, anonymous=True)
+                return
+            candidate = re.fullmatch(
+                r'/api/games/([A-Za-z0-9_-]{1,64})/candidate/(\d{1,10})/audio', path)
+            if candidate:
+                service, media = self.services()
+                track = service.candidate_audio_source(candidate[1], int(candidate[2]))
+                self.send_bytes(media.get(track), 'audio/mpeg', body, anonymous=True)
+                return
+            if path not in ASSETS:
+                self.send_error(404)
+                return
+            asset = ROOT / 'web' / ALIASES.get(path, path[1:])
+            if not asset.is_file():
+                self.send_error(404)
+                return
+            self.send_bytes(asset.read_bytes(), mimetypes.guess_type(asset)[0] or 'application/octet-stream', body)
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
+            pass
+        except Exception as error:
+            self.api_error(error, body)
+
+
+if __name__ == '__main__':
     import argparse
-    parser=argparse.ArgumentParser()
-    parser.add_argument('--port',type=int,default=8765)
-    port=parser.parse_args().port
-    print(f'Yinxun: http://127.0.0.1:{port}',flush=True)
-    ThreadingHTTPServer(('127.0.0.1',port),Handler).serve_forever()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--port', type=int, default=8780)
+    port = parser.parse_args().port
+    print(f'Yinxun: http://127.0.0.1:{port}', flush=True)
+    ThreadingHTTPServer(('127.0.0.1', port), Handler).serve_forever()

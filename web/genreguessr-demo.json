@@ -1,0 +1,759 @@
+{
+  "source": "https://github.com/AyrtonB/EveryNoise-Watch",
+  "revision": "26915304e3b99dc70b0c3f85b0e3954289df72f0",
+  "license": "CC BY-SA 4.0",
+  "note": "Hand-curated visual prototype groups only. These are not metric-generated clusters and do not implement target selection, sampling, scoring, or audio. All genre names, colors, and XY coordinates are copied exactly from map-data.json. Group IDs are internal and should not label the round choices.",
+  "selectedGenre": "jazz fusion",
+  "groups": [
+    {
+      "id": "jazz",
+      "genres": [
+        {
+          "name": "jazz",
+          "color": "#509064",
+          "x": 913,
+          "y": 2841
+        },
+        {
+          "name": "bebop",
+          "color": "#56916d",
+          "x": 921,
+          "y": 3007
+        },
+        {
+          "name": "cool jazz",
+          "color": "#529169",
+          "x": 903,
+          "y": 2968
+        },
+        {
+          "name": "soul jazz",
+          "color": "#5b915f",
+          "x": 901,
+          "y": 3665
+        },
+        {
+          "name": "jazz fusion",
+          "color": "#638d66",
+          "x": 828,
+          "y": 4447
+        },
+        {
+          "name": "jazz funk",
+          "color": "#728b5d",
+          "x": 885,
+          "y": 5869
+        },
+        {
+          "name": "latin jazz",
+          "color": "#868649",
+          "x": 988,
+          "y": 5233
+        },
+        {
+          "name": "smooth jazz",
+          "color": "#888f73",
+          "x": 925,
+          "y": 11605
+        },
+        {
+          "name": "free jazz",
+          "color": "#598f5a",
+          "x": 763,
+          "y": 3487
+        },
+        {
+          "name": "spiritual jazz",
+          "color": "#6e8360",
+          "x": 683,
+          "y": 4813
+        },
+        {
+          "name": "avant-garde jazz",
+          "color": "#538f60",
+          "x": 758,
+          "y": 3500
+        },
+        {
+          "name": "contemporary jazz",
+          "color": "#519686",
+          "x": 705,
+          "y": 4131
+        },
+        {
+          "name": "straight-ahead jazz",
+          "color": "#529775",
+          "x": 870,
+          "y": 3297
+        },
+        {
+          "name": "jazz piano",
+          "color": "#4d908d",
+          "x": 974,
+          "y": 2589
+        },
+        {
+          "name": "jazz guitar",
+          "color": "#51968b",
+          "x": 1013,
+          "y": 3499
+        },
+        {
+          "name": "jazz saxophone",
+          "color": "#588f5e",
+          "x": 872,
+          "y": 3398
+        },
+        {
+          "name": "jazz trumpet",
+          "color": "#578c64",
+          "x": 889,
+          "y": 3170
+        },
+        {
+          "name": "jazz trio",
+          "color": "#4e98ac",
+          "x": 907,
+          "y": 2892
+        },
+        {
+          "name": "jazz quartet",
+          "color": "#4d9856",
+          "x": 895,
+          "y": 3271
+        },
+        {
+          "name": "vocal jazz",
+          "color": "#4a913b",
+          "x": 828,
+          "y": 2690
+        }
+      ]
+    },
+    {
+      "id": "folk",
+      "genres": [
+        {
+          "name": "folk",
+          "color": "#65910f",
+          "x": 763,
+          "y": 5793
+        },
+        {
+          "name": "contemporary folk",
+          "color": "#509e0d",
+          "x": 797,
+          "y": 5506
+        },
+        {
+          "name": "traditional folk",
+          "color": "#4c9727",
+          "x": 995,
+          "y": 2437
+        },
+        {
+          "name": "british folk",
+          "color": "#579a1e",
+          "x": 779,
+          "y": 5333
+        },
+        {
+          "name": "irish folk",
+          "color": "#5e9818",
+          "x": 646,
+          "y": 4990
+        },
+        {
+          "name": "scottish folk",
+          "color": "#62a134",
+          "x": 506,
+          "y": 5771
+        },
+        {
+          "name": "american folk revival",
+          "color": "#459713",
+          "x": 903,
+          "y": 2791
+        },
+        {
+          "name": "appalachian folk",
+          "color": "#519624",
+          "x": 980,
+          "y": 3119
+        },
+        {
+          "name": "chamber folk",
+          "color": "#4ea13c",
+          "x": 469,
+          "y": 4737
+        },
+        {
+          "name": "indie folk",
+          "color": "#719521",
+          "x": 569,
+          "y": 6942
+        },
+        {
+          "name": "psychedelic folk",
+          "color": "#699325",
+          "x": 655,
+          "y": 6091
+        },
+        {
+          "name": "freak folk",
+          "color": "#828759",
+          "x": 440,
+          "y": 7734
+        },
+        {
+          "name": "anti-folk",
+          "color": "#878628",
+          "x": 586,
+          "y": 7239
+        },
+        {
+          "name": "folk rock",
+          "color": "#838410",
+          "x": 694,
+          "y": 6671
+        },
+        {
+          "name": "new americana",
+          "color": "#7b9011",
+          "x": 610,
+          "y": 7017
+        },
+        {
+          "name": "roots americana",
+          "color": "#8f8c09",
+          "x": 660,
+          "y": 9497
+        },
+        {
+          "name": "alternative americana",
+          "color": "#789223",
+          "x": 569,
+          "y": 7176
+        },
+        {
+          "name": "bluegrass",
+          "color": "#6b9626",
+          "x": 858,
+          "y": 5781
+        },
+        {
+          "name": "traditional bluegrass",
+          "color": "#859438",
+          "x": 793,
+          "y": 7833
+        },
+        {
+          "name": "progressive bluegrass",
+          "color": "#799437",
+          "x": 772,
+          "y": 6412
+        }
+      ]
+    },
+    {
+      "id": "ambient",
+      "genres": [
+        {
+          "name": "ambient",
+          "color": "#5593c5",
+          "x": 305,
+          "y": 7215
+        },
+        {
+          "name": "deep ambient",
+          "color": "#4691cc",
+          "x": 172,
+          "y": 5294
+        },
+        {
+          "name": "dark ambient",
+          "color": "#7078bc",
+          "x": 254,
+          "y": 8040
+        },
+        {
+          "name": "drone ambient",
+          "color": "#4484d8",
+          "x": 36,
+          "y": 2917
+        },
+        {
+          "name": "space ambient",
+          "color": "#7598cd",
+          "x": 341,
+          "y": 9850
+        },
+        {
+          "name": "organic ambient",
+          "color": "#7098a7",
+          "x": 450,
+          "y": 9434
+        },
+        {
+          "name": "compositional ambient",
+          "color": "#2fa1bb",
+          "x": 330,
+          "y": 2715
+        },
+        {
+          "name": "experimental ambient",
+          "color": "#5396bf",
+          "x": 293,
+          "y": 6077
+        },
+        {
+          "name": "future ambient",
+          "color": "#9490a6",
+          "x": 939,
+          "y": 16493
+        },
+        {
+          "name": "pop ambient",
+          "color": "#7698c6",
+          "x": 726,
+          "y": 13374
+        },
+        {
+          "name": "ambient pop",
+          "color": "#6a948f",
+          "x": 367,
+          "y": 8004
+        },
+        {
+          "name": "ambient idm",
+          "color": "#8d8fb1",
+          "x": 624,
+          "y": 12967
+        },
+        {
+          "name": "deep idm",
+          "color": "#9982ae",
+          "x": 841,
+          "y": 14547
+        },
+        {
+          "name": "abstract idm",
+          "color": "#9986a8",
+          "x": 610,
+          "y": 13571
+        },
+        {
+          "name": "ambient techno",
+          "color": "#958bc4",
+          "x": 851,
+          "y": 15558
+        },
+        {
+          "name": "ambient dub techno",
+          "color": "#9190d0",
+          "x": 1018,
+          "y": 17000
+        },
+        {
+          "name": "ambient house",
+          "color": "#a388ae",
+          "x": 909,
+          "y": 16911
+        },
+        {
+          "name": "ambient psychill",
+          "color": "#a097c5",
+          "x": 716,
+          "y": 16555
+        },
+        {
+          "name": "downtempo",
+          "color": "#9b8a77",
+          "x": 806,
+          "y": 15507
+        },
+        {
+          "name": "downtempo fusion",
+          "color": "#908f8c",
+          "x": 726,
+          "y": 14697
+        }
+      ]
+    },
+    {
+      "id": "metal",
+      "genres": [
+        {
+          "name": "metal",
+          "color": "#d95139",
+          "x": 224,
+          "y": 12025
+        },
+        {
+          "name": "speed metal",
+          "color": "#e64334",
+          "x": 204,
+          "y": 12085
+        },
+        {
+          "name": "thrash metal",
+          "color": "#e6443f",
+          "x": 248,
+          "y": 11056
+        },
+        {
+          "name": "death metal",
+          "color": "#e73c68",
+          "x": 166,
+          "y": 10884
+        },
+        {
+          "name": "black metal",
+          "color": "#da3d7f",
+          "x": 81,
+          "y": 10847
+        },
+        {
+          "name": "doom metal",
+          "color": "#ba6c63",
+          "x": 155,
+          "y": 9925
+        },
+        {
+          "name": "power metal",
+          "color": "#d65e23",
+          "x": 210,
+          "y": 14496
+        },
+        {
+          "name": "progressive metal",
+          "color": "#b37535",
+          "x": 252,
+          "y": 12319
+        },
+        {
+          "name": "symphonic metal",
+          "color": "#c96a27",
+          "x": 201,
+          "y": 14276
+        },
+        {
+          "name": "gothic metal",
+          "color": "#c27236",
+          "x": 208,
+          "y": 13919
+        },
+        {
+          "name": "folk metal",
+          "color": "#d66044",
+          "x": 193,
+          "y": 14460
+        },
+        {
+          "name": "industrial metal",
+          "color": "#d5634f",
+          "x": 463,
+          "y": 17479
+        },
+        {
+          "name": "alternative metal",
+          "color": "#d45c2d",
+          "x": 309,
+          "y": 13771
+        },
+        {
+          "name": "groove metal",
+          "color": "#e74934",
+          "x": 263,
+          "y": 12122
+        },
+        {
+          "name": "sludge metal",
+          "color": "#c1607e",
+          "x": 172,
+          "y": 9361
+        },
+        {
+          "name": "stoner metal",
+          "color": "#c46763",
+          "x": 254,
+          "y": 9588
+        },
+        {
+          "name": "melodic death metal",
+          "color": "#e45054",
+          "x": 152,
+          "y": 14708
+        },
+        {
+          "name": "technical death metal",
+          "color": "#e93c8e",
+          "x": 163,
+          "y": 10430
+        },
+        {
+          "name": "atmospheric black metal",
+          "color": "#be4eb0",
+          "x": 55,
+          "y": 10663
+        },
+        {
+          "name": "post-metal",
+          "color": "#a76fa2",
+          "x": 134,
+          "y": 10084
+        }
+      ]
+    },
+    {
+      "id": "classical",
+      "genres": [
+        {
+          "name": "classical",
+          "color": "#24a08f",
+          "x": 373,
+          "y": 800
+        },
+        {
+          "name": "baroque",
+          "color": "#2ba476",
+          "x": 391,
+          "y": 1855
+        },
+        {
+          "name": "classical era",
+          "color": "#20a398",
+          "x": 450,
+          "y": 738
+        },
+        {
+          "name": "early romantic era",
+          "color": "#1ea3ad",
+          "x": 440,
+          "y": 480
+        },
+        {
+          "name": "late romantic era",
+          "color": "#269a8a",
+          "x": 320,
+          "y": 579
+        },
+        {
+          "name": "post-romantic era",
+          "color": "#1e9f93",
+          "x": 301,
+          "y": 432
+        },
+        {
+          "name": "early modern classical",
+          "color": "#219b9a",
+          "x": 347,
+          "y": 652
+        },
+        {
+          "name": "contemporary classical",
+          "color": "#1e9a8a",
+          "x": 336,
+          "y": 1068
+        },
+        {
+          "name": "21st century classical",
+          "color": "#259977",
+          "x": 292,
+          "y": 1559
+        },
+        {
+          "name": "chamber orchestra",
+          "color": "#27a59a",
+          "x": 322,
+          "y": 1377
+        },
+        {
+          "name": "chamber ensemble",
+          "color": "#23a696",
+          "x": 347,
+          "y": 1104
+        },
+        {
+          "name": "modern chamber music",
+          "color": "#39a291",
+          "x": 491,
+          "y": 2816
+        },
+        {
+          "name": "classical piano",
+          "color": "#20a2d5",
+          "x": 508,
+          "y": 326
+        },
+        {
+          "name": "classical guitar",
+          "color": "#28acd6",
+          "x": 923,
+          "y": 920
+        },
+        {
+          "name": "classical cello",
+          "color": "#21a4b4",
+          "x": 297,
+          "y": 640
+        },
+        {
+          "name": "classical flute",
+          "color": "#27a8a5",
+          "x": 421,
+          "y": 1571
+        },
+        {
+          "name": "classical clarinet",
+          "color": "#459a76",
+          "x": 739,
+          "y": 2956
+        },
+        {
+          "name": "classical harp",
+          "color": "#1cafb6",
+          "x": 627,
+          "y": 775
+        },
+        {
+          "name": "classical organ",
+          "color": "#1e9eb1",
+          "x": 72,
+          "y": 2336
+        },
+        {
+          "name": "classical string trio",
+          "color": "#19ad81",
+          "x": 381,
+          "y": 701
+        }
+      ]
+    },
+    {
+      "id": "hiphop",
+      "genres": [
+        {
+          "name": "hip hop",
+          "color": "#ac7d0b",
+          "x": 1074,
+          "y": 13902
+        },
+        {
+          "name": "old school hip hop",
+          "color": "#b46911",
+          "x": 1241,
+          "y": 16974
+        },
+        {
+          "name": "golden age hip hop",
+          "color": "#b06b0e",
+          "x": 1197,
+          "y": 16013
+        },
+        {
+          "name": "east coast hip hop",
+          "color": "#b4700e",
+          "x": 1107,
+          "y": 12962
+        },
+        {
+          "name": "west coast rap",
+          "color": "#ad7a07",
+          "x": 1158,
+          "y": 15015
+        },
+        {
+          "name": "southern hip hop",
+          "color": "#aa8504",
+          "x": 1065,
+          "y": 14661
+        },
+        {
+          "name": "hardcore hip hop",
+          "color": "#b3720d",
+          "x": 1087,
+          "y": 11752
+        },
+        {
+          "name": "conscious hip hop",
+          "color": "#b0780b",
+          "x": 1039,
+          "y": 11199
+        },
+        {
+          "name": "political hip hop",
+          "color": "#b6720e",
+          "x": 999,
+          "y": 10294
+        },
+        {
+          "name": "alternative hip hop",
+          "color": "#b07520",
+          "x": 1014,
+          "y": 10718
+        },
+        {
+          "name": "abstract hip hop",
+          "color": "#ad7931",
+          "x": 899,
+          "y": 12949
+        },
+        {
+          "name": "experimental hip hop",
+          "color": "#a47b3a",
+          "x": 753,
+          "y": 10649
+        },
+        {
+          "name": "underground hip hop",
+          "color": "#a18911",
+          "x": 968,
+          "y": 12539
+        },
+        {
+          "name": "indie hip hop",
+          "color": "#988d07",
+          "x": 1028,
+          "y": 10535
+        },
+        {
+          "name": "jazz rap",
+          "color": "#a5772e",
+          "x": 1107,
+          "y": 13827
+        },
+        {
+          "name": "psychedelic hip hop",
+          "color": "#a37d37",
+          "x": 851,
+          "y": 11937
+        },
+        {
+          "name": "jazz boom bap",
+          "color": "#8e887e",
+          "x": 1117,
+          "y": 15252
+        },
+        {
+          "name": "boom bap",
+          "color": "#b77412",
+          "x": 911,
+          "y": 10930
+        },
+        {
+          "name": "rap",
+          "color": "#ab8105",
+          "x": 1085,
+          "y": 14411
+        },
+        {
+          "name": "pop rap",
+          "color": "#af8405",
+          "x": 1011,
+          "y": 15318
+        }
+      ]
+    }
+  ]
+}
