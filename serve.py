@@ -9,7 +9,7 @@ import mimetypes
 import re
 
 ROOT = Path(__file__).resolve().parent
-ASSETS = {'/', '/index.html', '/home.css', '/style.css', '/map.html', '/map.css', '/i18n.js', '/i18n.css', '/i18n-messages.js',
+ASSETS = {'/', '/index.html', '/home.css', '/style.css', '/map.html', '/map.css', '/i18n.js', '/i18n.css', '/i18n-messages.js', '/genre-names.js', '/genre-ui.js',
           '/map.js', '/map-data.json', '/genreguessr', '/genreguessr/',
           '/genreguessr.html', '/genreguessr.css', '/genreguessr.js',
           '/genre-cluster.js', '/genre-cluster.css',

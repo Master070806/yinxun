@@ -7,6 +7,7 @@ const texts = new Map();
 const attributes = new Map();
 
 export const translate = (source) => localize(source, language);
+export const currentLanguage = () => language;
 
 export function setText(element, source) {
   // Bind the text node, not the container: appended answer links survive a switch.
