@@ -21,3 +21,5 @@ jobs:
       - run: node --check web/genre-cluster.js
       - run: node --check web/genrerace.js
       - run: node --check web/multiplayer.js
+      - run: node --check web/i18n.js
+      - run: node --test tests/i18n.test.mjs

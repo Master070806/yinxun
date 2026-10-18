@@ -2,6 +2,12 @@
 
 A collection of games about listening and exploring musical genres, brought by **Circles & Basterds**.
 
+The home, about, and solo/multiplayer game pages support **简体中文 / English**.
+Use the button in the bottom-left corner to switch instantly without restarting
+the game. Chinese is the initial default; your choice is saved in the browser.
+Genre names and player nicknames retain their original spelling. The legacy map
+remains a separate Chinese-only experiment.
+
 **Genreguessr** is a two-round listening game built on [Every Noise at Once](https://everynoise.com/). It uses a consistent local snapshot of **6,291 genres**, with their map coordinates, colors, musical neighborhoods, contrasting neighborhoods, and song samples. Three selectable metrics determine what it means for genres to be close.
 
 **Genrerace** is a route-finding game on the same complete metric space: choose a start and goal, listen to nearby genres, and move through their neighborhoods until you reach the goal. Both games share the catalog and metric engine. The interface uses randomly scattered genre names in their original RGB colors; their positions on the game screen do not represent metric distance.
@@ -171,6 +177,11 @@ Answers, source track metadata and correct-cluster identifiers stay on the serve
 
 ## Validation
 
+Answer submissions can be retried safely with the same choice. If a response is
+lost after the server accepts it, the solo guessing page retrieves the committed
+result instead of accepting a second answer. Changing an already submitted answer
+is still rejected. In-flight requests show a submitting state and have a timeout.
+
 ```sh
 .venv/bin/python -m unittest discover -s tests -v
 .venv/bin/python scripts/check_project.py
@@ -179,6 +190,7 @@ node --check web/genrerace.js
 node --check web/multiplayer.js
 node --check web/genre-cluster.js
 node --check web/map.js
+node --test tests/i18n.test.mjs
 ```
 
 The tests use small fixtures and do not require the full crawl or online audio. Actual playback and complete-catalog generation are checked separately. GitHub Actions runs the automated checks on pushes and pull requests.

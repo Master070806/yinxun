@@ -1,3 +1,4 @@
+import { setText, setAttr } from '/i18n.js';
 import { GenreCluster } from '/genre-cluster.js';
 
 const $ = (selector) => document.querySelector(selector);
@@ -55,13 +56,13 @@ async function request(path, payload, token = state.credentials?.token) {
 
 function message(text = '', selector) {
   const target = $(selector || (state.page === 'setup' ? '#setup-message' : state.page === 'join' ? '#join-message' : '#game-message'));
-  target.textContent = text;
+  setText(target, text);
   target.hidden = !text;
 }
 
 function connection(text = '', terminal = false) {
   $('#connection-banner').hidden = !text;
-  $('#connection-message').textContent = text;
+  setText($('#connection-message'), text);
   $('#fresh-room').hidden = !terminal;
   $('#retry-connection').hidden = terminal;
 }
@@ -74,7 +75,7 @@ function showPage(page) {
   $('#room-shell').hidden = page === 'setup' || page === 'join';
   document.body.classList.toggle('playing', ['cluster', 'genre', 'race'].includes(page));
   document.body.classList.toggle('in-room', !$('#room-shell').hidden);
-  document.title = `Multiplayer ${title} — Cartography & BGMs`;
+  setText(document.querySelector('title'), `Multiplayer ${title} — Cartography & BGMs`);
   window.scrollTo({ top: 0, behavior: 'instant' });
   $(`#${page} h1`)?.focus({ preventScroll: true });
 }
@@ -134,9 +135,9 @@ function setBusy(busy) {
   $('#player-name').closest('.name-field').hidden = state.editing;
   $('#join-name').disabled = busy;
   $('#create-room').disabled = busy || !state.ready;
-  $('#create-room').textContent = busy && state.page === 'setup' ? 'Preparing…' : state.editingRecovery ? 'Update & retry round →' : state.editing ? 'Save settings →' : 'Create room →';
+  setText($('#create-room'), busy && state.page === 'setup' ? 'Preparing…' : state.editingRecovery ? 'Update & retry round →' : state.editing ? 'Save settings →' : 'Create room →');
   $('#join-room').disabled = busy || !state.preview || state.preview.stage !== 'lobby';
-  $('#join-room').textContent = busy && state.page === 'join' ? 'Joining…' : 'Join room →';
+  setText($('#join-room'), busy && state.page === 'join' ? 'Joining…' : 'Join room →');
   $$('.randomize-genre').forEach((button) => { button.disabled = busy || !state.ready; });
   updateControls();
 }
@@ -158,13 +159,13 @@ function updateControls() {
   $('#recover-settings').disabled = state.busy || state.stopped;
   $('#start-game').hidden = !isHost();
   $('#start-game').disabled = state.busy || state.stopped || activePlayers().length < 2;
-  $('#start-game').textContent = state.busy && room.stage === 'lobby' ? 'Preparing…' : mode === 'race' ? 'Start race →' : 'Start game →';
+  setText($('#start-game'), state.busy && room.stage === 'lobby' ? 'Preparing…' : mode === 'race' ? 'Start race →' : 'Start game →');
   $('#submit-cluster').disabled = !canChoose('cluster') || state.selection === null;
   $('#submit-genre').disabled = !canChoose('genre') || state.selection === null;
   $('#submit-move').disabled = !canChoose('race') || !state.selection || sameId(genreId(state.selection), genreId(room.race?.current));
   const retry = Boolean(isHost() && room.error?.retryable && activePlayers().every((item) => item.ready));
   $('#ready-next').disabled = state.busy || state.stopped || (player.ready && !retry);
-  $('#ready-next').textContent = retry ? 'Retry next round →' : player.ready ? 'Ready — waiting…' : room.round_number >= room.total_rounds ? 'Finish game →' : 'Next round →';
+  setText($('#ready-next'), retry ? 'Retry next round →' : player.ready ? 'Ready — waiting…' : room.round_number >= room.total_rounds ? 'Finish game →' : 'Next round →');
   $$('.remove-player').forEach((button) => { button.disabled = state.busy || state.stopped; });
   $$('.cluster-card').forEach((card) => {
     const disabled = !canChoose('cluster');
@@ -183,15 +184,19 @@ function disposeScenes() {
   choiceScene = null;
 }
 
-function node(tag, text, className) {
+function node(tag, text, className, localize = true) {
   const element = document.createElement(tag);
-  if (text !== undefined) element.textContent = text;
+  if (text !== undefined) {
+    if (localize) setText(element, text);
+    else element.textContent = text;
+  }
   if (className) element.className = className;
   return element;
 }
 
 function playerName(player) {
-  return `${player.name}${player.id === self()?.id ? ' (you)' : ''}${player.left ? ' · left' : ''}`;
+  const isSelf = player.id === self()?.id;
+  return (language) => `${player.name}${isSelf ? (language === 'en' ? ' (you)' : '（你）') : ''}${player.left ? (language === 'en' ? ' · left' : ' · 已离开') : ''}`;
 }
 
 function renderPlayers() {
@@ -201,26 +206,26 @@ function renderPlayers() {
     players.map(({ id, name, score, submitted, eligible, ready, left }) => [id, name, score, submitted, eligible, ready, left])]);
   if (key === playersKey) return;
   playersKey = key;
-  $('#player-count').textContent = `${activePlayers().length} ${activePlayers().length === 1 ? 'player' : 'players'}`;
+  setText($('#player-count'), `${activePlayers().length} ${activePlayers().length === 1 ? 'player' : 'players'}`);
   $('#player-list').replaceChildren(...players.map((player) => {
     const item = node('li', undefined, player.left ? 'player-left' : '');
     const name = node('span', playerName(player), 'player-name');
     if (player.id === room.host_id) name.append(node('span', 'Host', 'host-label'));
     const status = node('span', '', 'player-status');
-    if (player.left) status.textContent = 'Left';
-    else if (room.stage === 'lobby') status.textContent = 'Joined';
-    else if (room.stage === 'cluster') status.textContent = player.submitted ? 'Selected' : 'Choosing…';
-    else if (room.stage === 'genre') status.textContent = !player.eligible ? '0 this round' : player.submitted ? 'Selected' : 'Choosing…';
-    else if (room.stage === 'round_result') status.textContent = player.ready ? 'Ready' : 'Reviewing…';
-    else if (room.stage === 'race') status.textContent = 'Racing';
-    else status.textContent = room.winner_ids?.includes(player.id) ? 'Winner' : 'Finished';
+    if (player.left) setText(status, 'Left');
+    else if (room.stage === 'lobby') setText(status, 'Joined');
+    else if (room.stage === 'cluster') setText(status, player.submitted ? 'Selected' : 'Choosing…');
+    else if (room.stage === 'genre') setText(status, !player.eligible ? '0 this round' : player.submitted ? 'Selected' : 'Choosing…');
+    else if (room.stage === 'round_result') setText(status, player.ready ? 'Ready' : 'Reviewing…');
+    else if (room.stage === 'race') setText(status, 'Racing');
+    else setText(status, room.winner_ids?.includes(player.id) ? 'Winner' : 'Finished');
     item.append(name, status);
     if (mode === 'guessr') item.append(node('span', `${player.score || 0} pts`, 'player-score'));
     if (isHost() && player.id !== self()?.id && !player.left && room.stage !== 'finished') {
       const remove = node('button', 'Remove', 'text-button remove-player');
       remove.type = 'button';
-      remove.setAttribute('aria-label', `Remove ${player.name} from the room`);
-      remove.title = 'Remove a player who has left or disconnected';
+      setAttr(remove, 'aria-label', `Remove ${player.name} from the room`);
+      setAttr(remove, 'title', 'Remove a player who has left or disconnected');
       remove.addEventListener('click', () => act('remove', { player_id: player.id }));
       item.append(remove);
     }
@@ -235,7 +240,7 @@ function renderCluster() {
     card.tabIndex = 0;
     card.setAttribute('role', 'button');
     card.setAttribute('aria-pressed', 'false');
-    card.setAttribute('aria-label', `Cluster ${index + 1}: ${group.genres.map((genre) => genre.name).join(', ')}`);
+    setAttr(card, 'aria-label', `Cluster ${index + 1}: ${group.genres.map((genre) => genre.name).join(', ')}`);
     const viewport = node('div', undefined, 'cluster-viewport');
     card.append(viewport);
     $('#cluster-grid').append(card);
@@ -247,7 +252,7 @@ function renderCluster() {
         other.classList.toggle('is-selected', other === card);
         other.setAttribute('aria-pressed', String(other === card));
       });
-      $('#game-announcement').textContent = `Cluster ${index + 1} selected. Press Select to submit.`;
+      setText($('#game-announcement'), `Cluster ${index + 1} selected. Press Select to submit.`);
       message();
       updateControls();
     };
@@ -269,7 +274,7 @@ function renderGenreCluster() {
       if (!canChoose(state.room.stage)) return;
       state.selection = genre;
       choiceScene.select(name);
-      $('#game-announcement').textContent = `${name} selected. Press Select to ${room.stage === 'race' ? 'move' : 'submit'}.`;
+      setText($('#game-announcement'), `${name} selected. Press Select to ${room.stage === 'race' ? 'move' : 'submit'}.`);
       message();
       updateControls();
       const source = room.stage === 'race' ? `/api/genres/${encodeURIComponent(genre.id)}/audio` :
@@ -279,11 +284,11 @@ function renderGenreCluster() {
   });
   scenes.push(choiceScene);
   choiceScene.items.forEach(({ genre, label }) => {
-    label.title = `Listen to ${genre.name}`;
+    setAttr(label, 'title', `Listen to ${genre.name}`);
     if (room.stage === 'race' && sameId(genre.id, room.race.current.id)) {
       label.classList.add('race-current');
       label.setAttribute('aria-current', 'location');
-      label.setAttribute('aria-label', `${genre.name}, current genre`);
+      setAttr(label, 'aria-label', `${genre.name}, current genre`);
     }
   });
 }
@@ -296,7 +301,7 @@ function renderRoute(route, container) {
       arrow.setAttribute('aria-hidden', 'true');
       item.append(arrow);
     }
-    const label = node('span', genre.name, 'trace-genre');
+    const label = node('span', genre.name, 'trace-genre', false);
     label.style.color = genre.color || '';
     item.append(label);
     return item;
@@ -323,7 +328,7 @@ function renderScoreboard(container, result, final = false) {
     row.append(name);
     if (!final) {
       const guess = player.cluster_correct === false ? 'Wrong cluster' : player.guess?.name || (typeof player.guess === 'string' ? player.guess : '—');
-      row.append(node('td', guess), node('td', `+${player.round_score || 0}`));
+      row.append(node('td', guess, undefined, player.cluster_correct === false), node('td', `+${player.round_score || 0}`));
     }
     row.append(node('td', String(player.score || 0)));
     body.append(row);
@@ -364,57 +369,57 @@ function applySnapshot(value) {
     message('', '#game-message');
   }
   showPage(room.stage === 'round_result' ? 'round-result' : room.stage);
-  $('#room-label').textContent = `${title} · ${room.id}`;
+  setText($('#room-label'), `${title} · ${room.id}`);
   renderPlayers();
   const progress = `Round ${room.round_number} of ${room.total_rounds}`;
   if (room.stage === 'lobby') {
     $('#invite-link').value = `${location.origin}/multiplayer-genre${mode}?room=${encodeURIComponent(room.id)}`;
-    $('#lobby-settings').textContent = settingsSummary(room);
-    $('#lobby-waiting').textContent = isHost() ? activePlayers().length < 2 ? 'Waiting for a friend. At least 2 players are needed.' : 'Everyone is here? Start when you’re ready.' : 'Waiting for the host to start.';
+    setText($('#lobby-settings'), settingsSummary(room));
+    setText($('#lobby-waiting'), isHost() ? activePlayers().length < 2 ? 'Waiting for a friend. At least 2 players are needed.' : 'Everyone is here? Start when you’re ready.' : 'Waiting for the host to start.');
     if (['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)) {
-      $('#invite-note').textContent = 'For friends on other devices, open this site through its shared network address before copying the link.';
+      setText($('#invite-note'), 'For friends on other devices, open this site through its shared network address before copying the link.');
     }
   } else if (room.stage === 'cluster') {
-    $('#cluster-progress').textContent = `${progress} · Stage 1 of 2`;
+    setText($('#cluster-progress'), `${progress} · Stage 1 of 2`);
     if (changed) renderCluster();
-    $('#cluster-waiting').textContent = player.submitted ? `Your choice is in. ${waitingFor(activePlayers().filter((item) => !item.submitted))}` : 'Listen, choose a cluster, then press Select. Everyone submits before the next stage.';
+    setText($('#cluster-waiting'), player.submitted ? `Your choice is in. ${waitingFor(activePlayers().filter((item) => !item.submitted))}` : 'Listen, choose a cluster, then press Select. Everyone submits before the next stage.');
   } else if (room.stage === 'genre') {
-    $('#genre-progress').textContent = `${progress} · Stage 2 of 2`;
+    setText($('#genre-progress'), `${progress} · Stage 2 of 2`);
     $('#genre-playing').hidden = !player.eligible;
     if (changed && player.eligible) renderGenreCluster();
     const pending = activePlayers().filter((item) => item.eligible && !item.submitted);
-    $('#genre-waiting').textContent = !player.eligible ? `Your cluster was incorrect: 0 points this round. ${waitingFor(pending)}` :
-      player.submitted ? `Your choice is in. ${waitingFor(pending)}` : 'Choose a genre to listen, then press Select. Closer guesses earn more points.';
+    setText($('#genre-waiting'), !player.eligible ? `Your cluster was incorrect: 0 points this round. ${waitingFor(pending)}` :
+      player.submitted ? `Your choice is in. ${waitingFor(pending)}` : 'Choose a genre to listen, then press Select. Closer guesses earn more points.');
   } else if (room.stage === 'round_result') {
-    $('#result-progress').textContent = progress;
+    setText($('#result-progress'), progress);
     const target = room.result?.target;
     $('#target-genre').textContent = target?.name || '—';
     $('#target-genre').style.color = target?.color || '';
     renderScoreboard($('#round-scoreboard'), room.result);
     const pending = activePlayers().filter((item) => !item.ready);
-    $('#result-waiting').textContent = pending.length ? waitingFor(pending, 'Ready when everyone is. Waiting for') : room.error?.retryable ? 'The next round could not load. The host can retry.' : 'Everyone is ready. Preparing the next stage…';
+    setText($('#result-waiting'), pending.length ? waitingFor(pending, 'Ready when everyone is. Waiting for') : room.error?.retryable ? 'The next round could not load. The host can retry.' : 'Everyone is ready. Preparing the next stage…');
   } else if (room.stage === 'race') {
     $('#race-goal-name').textContent = room.race.goal.name;
     $('#race-goal-name').style.color = room.race.goal.color || '';
-    $('#trace-count').textContent = `${room.race.moves} ${room.race.moves === 1 ? 'move' : 'moves'}`;
+    setText($('#trace-count'), `${room.race.moves} ${room.race.moves === 1 ? 'move' : 'moves'}`);
     if (changed) {
       renderGenreCluster();
       renderRoute(room.race.route, $('#race-trace'));
     }
-    $('#race-note').textContent = room.race.goal_reachable === false ? 'The goal is unreachable from this genre.' : `At ${room.race.current.name}. Choose a genre, then Select to move.`;
+    setText($('#race-note'), room.race.goal_reachable === false ? 'The goal is unreachable from this genre.' : `At ${room.race.current.name}. Choose a genre, then Select to move.`);
   } else if (room.stage === 'finished') {
     const winners = room.players.filter((item) => room.winner_ids?.includes(item.id));
-    $('#winner-message').textContent = winners.length ? `${winners.map((item) => item.name).join(' & ')} ${winners.length > 1 ? 'win' : 'wins'}${mode === 'race' ? ' the race' : ''}!` : 'The game has ended.';
+    setText($('#winner-message'), winners.length ? `${winners.map((item) => item.name).join(' & ')} ${winners.length > 1 ? 'win' : 'wins'}${mode === 'race' ? ' the race' : ''}!` : 'The game has ended.');
     $('#final-scoreboard').hidden = mode === 'race';
     $('#all-routes').hidden = mode !== 'race';
     if (mode === 'guessr') renderScoreboard($('#final-scoreboard'), room.result, true);
     else $('#all-routes').replaceChildren(...(room.routes || []).map((playerRoute) => {
       const section = node('section', undefined, 'finished-route');
       const heading = node('div', undefined, 'trace-heading');
-      heading.append(node('h2', `${playerRoute.name}${room.winner_ids?.includes(playerRoute.id) ? ' · Winner' : ''}`),
+      heading.append(node('h2', (language) => `${playerRoute.name}${room.winner_ids?.includes(playerRoute.id) ? (language === 'en' ? ' · Winner' : ' · 获胜') : ''}`),
         node('span', `${playerRoute.moves} ${playerRoute.moves === 1 ? 'move' : 'moves'}`));
       const route = node('ol', undefined, 'route-list');
-      route.setAttribute('aria-label', `${playerRoute.name}’s route`);
+      setAttr(route, 'aria-label', `${playerRoute.name}’s route`);
       renderRoute(playerRoute.route, route);
       section.append(heading, route);
       return section;
@@ -423,7 +428,7 @@ function applySnapshot(value) {
   }
   if (room.error?.error) message(room.error.error);
   else if (changed && ['cluster', 'genre'].includes(room.stage) && room.game?.audio_available === false && (room.stage === 'cluster' || player.eligible)) message('This sample is unavailable. You can still select an answer.');
-  if (changed) $('#game-announcement').textContent = `${room.stage === 'lobby' ? 'Lobby.' : room.stage === 'finished' ? 'Game finished.' : mode === 'guessr' ? `${progress}.` : 'Race started.'} ${$(`#${state.page} h1`)?.textContent || ''}`;
+  if (changed) setText($('#game-announcement'), `${room.stage === 'lobby' ? 'Lobby.' : room.stage === 'finished' ? 'Game finished.' : mode === 'guessr' ? `${progress}.` : 'Race started.'} ${$(`#${state.page} h1`)?.textContent || ''}`);
   updateControls();
 }
 
@@ -506,8 +511,8 @@ async function act(action, payload = {}) {
 function audioIndicator(status = '') {
   $$('.play-link').forEach((button) => {
     const active = audioRole === 'clue';
-    button.querySelector('span').textContent = active && status === 'loading' ? '…' : active && status === 'playing' ? 'Ⅱ' : '▷';
-    button.setAttribute('aria-label', `${active && status === 'playing' ? 'Pause' : 'Play'} ${state.room?.stage === 'genre' ? 'second' : 'first'} sample`);
+    setText(button.querySelector('span'), active && status === 'loading' ? '…' : active && status === 'playing' ? 'Ⅱ' : '▷');
+    setAttr(button, 'aria-label', `${active && status === 'playing' ? 'Pause' : 'Play'} ${state.room?.stage === 'genre' ? 'second' : 'first'} sample`);
   });
   choiceScene?.items.forEach(({ genre, label }) => {
     const active = audioRole === 'candidate' && sameId(genre.id, audioGenre?.id);
@@ -617,7 +622,7 @@ $$('.randomize-genre').forEach((button) => button.addEventListener('click', () =
   const choices = [...genres.values()];
   const genre = choices[Math.floor(Math.random() * choices.length)];
   document.getElementById(button.dataset.input).value = genre.name;
-  $('#randomization-status').textContent = `${button.dataset.input === 'start-genre' ? 'Start' : 'Goal'}: ${genre.name}.`;
+  setText($('#randomization-status'), `${button.dataset.input === 'start-genre' ? 'Start' : 'Goal'}: ${genre.name}.`);
   message();
 }));
 
@@ -702,13 +707,13 @@ $('#copy-link').addEventListener('click', async () => {
   try {
     if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
     await navigator.clipboard.writeText(input.value);
-    $('#invite-note').textContent = 'Link copied. Send it to your friends.';
+    setText($('#invite-note'), 'Link copied. Send it to your friends.');
   } catch {
     input.focus();
     input.select();
     let copied = false;
     try { copied = document.execCommand('copy'); } catch { /* Manual copy remains available. */ }
-    $('#invite-note').textContent = copied ? 'Link copied. Send it to your friends.' : 'Select and copy this link, then send it to your friends.';
+    setText($('#invite-note'), copied ? 'Link copied. Send it to your friends.' : 'Select and copy this link, then send it to your friends.');
   }
 });
 $('#retry-connection').addEventListener('click', () => {
@@ -733,35 +738,35 @@ async function loadCatalog() {
         option.value = genre.name;
         return option;
       }));
-      $('#catalog-caption').textContent = `${catalog.length.toLocaleString('en-US')} genres`;
+      setText($('#catalog-caption'), `${catalog.length.toLocaleString('en-US')} genres`);
       state.ready = true;
     } else {
       const status = await request('/api/status', undefined, null);
-      $('#catalog-caption').textContent = `${status.genres.toLocaleString('en-US')} genres`;
+      setText($('#catalog-caption'), `${status.genres.toLocaleString('en-US')} genres`);
       state.ready = status.ready;
       if (!state.ready) throw new Error('The genre catalog is not ready. Please try again shortly.');
     }
     connection();
   } catch (error) {
     connection(error.message || 'The genre list could not load. Please retry.');
-    $('#catalog-caption').textContent = 'Waiting for the genre catalog';
+    setText($('#catalog-caption'), 'Waiting for the genre catalog');
   } finally { setBusy(false); }
 }
 
 async function loadInvite() {
   showPage('join');
   state.preview = null;
-  $('#join-description').textContent = 'Finding the room…';
+  setText($('#join-description'), 'Finding the room…');
   setBusy(true);
   try {
     const preview = await request(roomPath(), undefined, null);
     if (preview.mode !== mode) { location.replace(`/multiplayer-genre${preview.mode}?room=${encodeURIComponent(preview.id)}`); return; }
     state.preview = preview;
-    $('#join-description').textContent = preview.stage === 'lobby' ? `${(preview.players || []).filter((player) => !player.left).length} players in the lobby. Join them.` : 'This game has already started. Join a new room for the next game.';
-    $('#join-settings').textContent = settingsSummary(preview);
+    setText($('#join-description'), preview.stage === 'lobby' ? `${(preview.players || []).filter((player) => !player.left).length} players in the lobby. Join them.` : 'This game has already started. Join a new room for the next game.');
+    setText($('#join-settings'), settingsSummary(preview));
     connection();
   } catch (error) {
-    $('#join-description').textContent = 'This invitation could not be opened.';
+    setText($('#join-description'), 'This invitation could not be opened.');
     if (error.data?.code === 'room_not_found') connection('This room has expired or no longer exists.', true);
     else if (error.data?.code === 'room_started') message('This game has already started. Join a new room for the next game.');
     else connection(error.message || 'The room could not load. Please retry.');
@@ -775,7 +780,7 @@ if (state.requestedRoom) {
   try { state.credentials = JSON.parse(storage.get(credentialKey(state.requestedRoom)) || 'null'); } catch { state.credentials = null; }
   if (state.credentials?.token && state.credentials?.player_id) {
     showPage('join');
-    $('#join-description').textContent = 'Reconnecting to your room…';
+    setText($('#join-description'), 'Reconnecting to your room…');
     try {
       applySnapshot(await request(roomPath()));
       schedulePoll();
