@@ -1,6 +1,26 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { translate } from '../web/i18n-messages.js';
+import { chineseGenre, genreLabel, findGenre } from '../web/genre-names.js';
+
+test('genre aliases preserve original identifiers and switch back to English', () => {
+  assert.equal(genreLabel('russian synthpop'), '俄罗斯合成器流行 · russian synthpop');
+  assert.equal(genreLabel('russian synthpop', 'en'), 'russian synthpop');
+  assert.equal(chineseGenre('swedish tropical house'), '瑞典热带浩室');
+  assert.equal(chineseGenre('instrumental grime'), 'Grime 器乐');
+  assert.equal(chineseGenre('imaginary rock'), null);
+  assert.equal(genreLabel('imaginary rock'), 'imaginary rock');
+});
+
+test('Chinese and bilingual search return original genre records, ambiguous aliases do not', () => {
+  const russian = {id: 11, name: 'russian synthpop'};
+  const genres = new Map([['russian synthpop', russian], ['british rock', {id: 12, name: 'british rock'}], ['uk rock', {id: 13, name: 'uk rock'}]]);
+  for (const query of ['俄罗斯合成器流行', '俄罗斯合成器流行 · russian synthpop', 'RUSSIAN SYNTHPOP']) {
+    assert.equal(findGenre(genres, query), russian);
+  }
+  assert.equal(findGenre(genres, '英国摇滚'), undefined);
+  assert.equal(findGenre(genres, '英国摇滚 · uk rock').id, 13);
+});
 
 test('English can be restored from the source, including whitespace', () => {
   assert.equal(translate(' Select '), ' 确认选择 ');

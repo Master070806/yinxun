@@ -5,8 +5,17 @@ A collection of games about listening and exploring musical genres, brought by *
 The home, about, and solo/multiplayer game pages support **简体中文 / English**.
 Use the button in the bottom-left corner to switch instantly without restarting
 the game. Chinese is the initial default; your choice is saved in the browser.
-Genre names and player nicknames retain their original spelling. The legacy map
-remains a separate Chinese-only experiment.
+Chinese mode shows supported genre aliases on candidate labels, with original names
+in their tooltips and available immediately through the English switch. Revealed
+answers, routes and race search suggestions use bilingual labels. Chinese or English
+search resolves to the original genre ID; ambiguous
+Chinese aliases require selecting the bilingual suggestion. Player nicknames remain
+unchanged. The legacy map remains a separate Chinese-only experiment.
+
+`web/genre-names.js` contains editable display aliases and conservative composition
+rules. This first pass covers 2,440 of the 6,291 names in the supplied crawl. These
+are reading aids, not official genre definitions; unrecognized names retain their
+original text. Regional and small-scene names still need further editorial work.
 
 **Genreguessr** is a two-round listening game built on [Every Noise at Once](https://everynoise.com/). It uses a consistent local snapshot of **6,291 genres**, with their map coordinates, colors, musical neighborhoods, contrasting neighborhoods, and song samples. Three selectable metrics determine what it means for genres to be close.
 

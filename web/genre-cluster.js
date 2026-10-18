@@ -1,3 +1,4 @@
+import { setGenreText } from '/genre-ui.js';
 /** A random, flat arrangement of genre names. Positions carry no metric meaning. */
 export class GenreCluster {
   constructor(container, genres, { selectable = false, onSelect = () => {}, large = false } = {}) {
@@ -19,7 +20,7 @@ export class GenreCluster {
     this.items = genres.map((genre) => {
       const label = document.createElement(selectable ? 'button' : 'span');
       label.className = 'gc-label';
-      label.textContent = genre.name;
+      setGenreText(label, genre.name, true);
       label.style.color = genre.color || '#555249';
       if (selectable) {
         label.type = 'button';
@@ -36,6 +37,8 @@ export class GenreCluster {
 
     this.observer = new ResizeObserver(() => this.schedule());
     this.observer.observe(container);
+    this.languageChanged = () => this.schedule();
+    window.addEventListener('languagechange', this.languageChanged);
     this.schedule();
     if (document.fonts?.ready) document.fonts.ready.then(() => this.schedule());
   }
@@ -176,6 +179,7 @@ export class GenreCluster {
   }
 
   destroy() {
+    window.removeEventListener('languagechange', this.languageChanged);
     this.disposed = true;
     if (this.frame !== null) cancelAnimationFrame(this.frame);
     this.observer.disconnect();

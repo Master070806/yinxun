@@ -1,3 +1,4 @@
+import { setGenreText } from '/genre-ui.js';
 import { setText, setAttr } from '/i18n.js';
 import { GenreCluster } from '/genre-cluster.js';
 
@@ -248,7 +249,7 @@ function renderFinal() {
   finalScene = new GenreCluster($('#final-viewport'), state.finalCluster.genres, {
     selectable: true, large: true, onSelect: chooseGenre,
   });
-  finalScene.items.forEach(({ label }) => { setAttr(label, 'title', 'Listen and select'); });
+  finalScene.items.forEach(({ label, genre }) => { label.title = genre.name; });
   setText($('#confirm-answer'), 'Select');
   $('#confirm-answer').disabled = true;
 }
@@ -287,7 +288,7 @@ function finish(result) {
   if (result.target.url) {
     const link = document.createElement('a');
     link.href = result.target.url;
-    link.textContent = result.target.name;
+    setGenreText(link, result.target.name);
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
     setAttr(link, 'title', 'View this genre on Every Noise at Once');

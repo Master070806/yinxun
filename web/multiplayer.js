@@ -1,3 +1,5 @@
+import { setGenreText, displayGenre, populateGenreOptions } from '/genre-ui.js';
+import { findGenre } from '/genre-names.js';
 import { setText, setAttr } from '/i18n.js';
 import { GenreCluster } from '/genre-cluster.js';
 
@@ -301,7 +303,8 @@ function renderRoute(route, container) {
       arrow.setAttribute('aria-hidden', 'true');
       item.append(arrow);
     }
-    const label = node('span', genre.name, 'trace-genre', false);
+    const label = node('span', undefined, 'trace-genre');
+    setGenreText(label, genre.name);
     label.style.color = genre.color || '';
     item.append(label);
     return item;
@@ -328,7 +331,10 @@ function renderScoreboard(container, result, final = false) {
     row.append(name);
     if (!final) {
       const guess = player.cluster_correct === false ? 'Wrong cluster' : player.guess?.name || (typeof player.guess === 'string' ? player.guess : '—');
-      row.append(node('td', guess, undefined, player.cluster_correct === false), node('td', `+${player.round_score || 0}`));
+      const guessCell = node('td');
+      if (player.cluster_correct === false) setText(guessCell, guess);
+      else setGenreText(guessCell, guess);
+      row.append(guessCell, node('td', `+${player.round_score || 0}`));
     }
     row.append(node('td', String(player.score || 0)));
     body.append(row);
@@ -393,13 +399,13 @@ function applySnapshot(value) {
   } else if (room.stage === 'round_result') {
     setText($('#result-progress'), progress);
     const target = room.result?.target;
-    $('#target-genre').textContent = target?.name || '—';
+    setGenreText($('#target-genre'), target?.name || '—');
     $('#target-genre').style.color = target?.color || '';
     renderScoreboard($('#round-scoreboard'), room.result);
     const pending = activePlayers().filter((item) => !item.ready);
     setText($('#result-waiting'), pending.length ? waitingFor(pending, 'Ready when everyone is. Waiting for') : room.error?.retryable ? 'The next round could not load. The host can retry.' : 'Everyone is ready. Preparing the next stage…');
   } else if (room.stage === 'race') {
-    $('#race-goal-name').textContent = room.race.goal.name;
+    setGenreText($('#race-goal-name'), room.race.goal.name);
     $('#race-goal-name').style.color = room.race.goal.color || '';
     setText($('#trace-count'), `${room.race.moves} ${room.race.moves === 1 ? 'move' : 'moves'}`);
     if (changed) {
@@ -577,8 +583,8 @@ $('#room-form').addEventListener('submit', async (event) => {
   if (mode === 'guessr') {
     if (!state.editingRecovery) payload.rounds = Number($('#rounds').value);
   } else {
-    const start = genres.get($('#start-genre').value.trim().toLowerCase());
-    const goal = genres.get($('#goal-genre').value.trim().toLowerCase());
+    const start = findGenre(genres, $('#start-genre').value);
+    const goal = findGenre(genres, $('#goal-genre').value);
     if (!start || !goal) {
       message('Choose a start and goal from the genre suggestions.');
       $(!start ? '#start-genre' : '#goal-genre').focus();
@@ -621,7 +627,7 @@ $$('.randomize-genre').forEach((button) => button.addEventListener('click', () =
   if (!state.ready || state.busy) return;
   const choices = [...genres.values()];
   const genre = choices[Math.floor(Math.random() * choices.length)];
-  document.getElementById(button.dataset.input).value = genre.name;
+  document.getElementById(button.dataset.input).value = displayGenre(genre.name);
   setText($('#randomization-status'), `${button.dataset.input === 'start-genre' ? 'Start' : 'Goal'}: ${genre.name}.`);
   message();
 }));
@@ -733,11 +739,7 @@ async function loadCatalog() {
     if (mode === 'race') {
       const { genres: catalog } = await request('/api/genres', undefined, null);
       genres = new Map(catalog.map(({ id, name, color }) => [name.toLowerCase(), { id, name, color }]));
-      $('#genre-options').replaceChildren(...[...genres.values()].sort((a, b) => a.name.localeCompare(b.name)).map((genre) => {
-        const option = node('option');
-        option.value = genre.name;
-        return option;
-      }));
+      populateGenreOptions($('#genre-options'), genres);
       setText($('#catalog-caption'), `${catalog.length.toLocaleString('en-US')} genres`);
       state.ready = true;
     } else {

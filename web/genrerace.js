@@ -1,3 +1,5 @@
+import { setGenreText, displayGenre, populateGenreOptions } from '/genre-ui.js';
+import { findGenre } from '/genre-names.js';
 import { setText, setAttr } from '/i18n.js';
 import { GenreCluster } from '/genre-cluster.js';
 
@@ -118,7 +120,7 @@ function renderTrace() {
     }
     const name = document.createElement('span');
     name.className = 'trace-genre';
-    name.textContent = genre.name;
+    setGenreText(name, genre.name);
     name.style.color = genre.color;
     if (index === state.route.length - 1) name.setAttribute('aria-current', 'location');
     stop.append(name);
@@ -137,14 +139,14 @@ function applyRace(race) {
     $('#visited-route').replaceChildren(...state.route.map((genre) => {
       const stop = document.createElement('li');
       const name = document.createElement('span');
-      name.textContent = genre.name;
+      setGenreText(name, genre.name);
       name.style.color = genre.color;
       stop.append(name);
       return stop;
     }));
   } else {
     if (state.stage !== 'race') showStage('race');
-    $('#race-goal-name').textContent = state.goal.name;
+    setGenreText($('#race-goal-name'), state.goal.name);
     $('#race-goal-name').style.color = state.goal.color;
     renderTrace();
     renderCluster();
@@ -232,7 +234,7 @@ $$('.randomize-genre').forEach((button) => {
     const choices = [...genres.values()];
     const genre = choices[Math.floor(Math.random() * choices.length)];
     const input = document.getElementById(button.dataset.input);
-    input.value = genre.name;
+    input.value = displayGenre(genre.name);
     message();
     setText($('#randomization-status'), `${input.name === 'start' ? 'Start' : 'Goal'}: ${genre.name}.`);
   });
@@ -240,8 +242,8 @@ $$('.randomize-genre').forEach((button) => {
 $('#race-form').addEventListener('submit', async (event) => {
   event.preventDefault();
   if (!ready || state.busy || state.stage !== 'setup') return;
-  const start = genres.get($('#start-genre').value.trim().toLowerCase());
-  const goal = genres.get($('#goal-genre').value.trim().toLowerCase());
+  const start = findGenre(genres, $('#start-genre').value);
+  const goal = findGenre(genres, $('#goal-genre').value);
   if (!start || !goal) {
     message('Choose a genre from the suggestions.');
     $(!start ? '#start-genre' : '#goal-genre').focus();
@@ -263,12 +265,7 @@ showStage('setup');
 try {
   const { genres: catalog } = await request('/api/genres');
   genres = new Map(catalog.map(({ id, name, color }) => [name.toLowerCase(), { id, name, color }]));
-  $('#genre-options').replaceChildren(...[...genres.values()]
-    .sort((a, b) => a.name.localeCompare(b.name)).map((genre) => {
-      const option = document.createElement('option');
-      option.value = genre.name;
-      return option;
-    }));
+  populateGenreOptions($('#genre-options'), genres);
   setText($('#catalog-caption'), `${catalog.length.toLocaleString('en-US')} genres`);
   ready = true;
   setBusy(false);
