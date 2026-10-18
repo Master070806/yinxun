@@ -1,3 +1,4 @@
+import { setText, setAttr } from '/i18n.js';
 import { GenreCluster } from '/genre-cluster.js';
 
 const $ = (selector) => document.querySelector(selector);
@@ -23,17 +24,25 @@ candidatePlayer.hidden = true;
 document.body.append(candidatePlayer);
 
 async function request(path, payload) {
-  const response = await fetch(path, payload === undefined ? { cache: 'no-store' } : {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
-  });
-  const data = await response.json();
-  if (!response.ok) throw Object.assign(new Error(data.error || 'Please try again.'), { data });
-  return data;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 20000);
+  try {
+    const response = await fetch(path, { cache: 'no-store', signal: controller.signal,
+      ...(payload === undefined ? {} : {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
+      }) });
+    const data = await response.json();
+    if (!response.ok) throw Object.assign(new Error(data.error || 'Please try again.'), { data });
+    return data;
+  } catch (error) {
+    if (error.name === 'AbortError') throw new Error('The server took too long to respond. Please retry.');
+    throw error;
+  } finally { clearTimeout(timeout); }
 }
 
 function message(text = '') {
   const node = state.stage === 'setup' ? $('#setup-message') : $(`#${state.stage} .game-message`);
-  node.textContent = text;
+  setText(node, text);
   node.hidden = !text;
 }
 
@@ -75,16 +84,19 @@ function setBusy(busy) {
   $$('#arrangement-form fieldset').forEach((field) => { field.disabled = busy; });
   const start = $('#arrangement-form button[type=submit]');
   start.disabled = busy || !ready;
-  start.textContent = busy ? 'Preparing…' : state.retryId ? 'Retry game →' : 'Start game →';
+  setText(start, busy ? 'Preparing…' : state.retryId ? 'Retry game →' : 'Start game →');
   $('#continue-button').disabled = busy || (!state.finished && state.cluster === null);
   $('#confirm-answer').disabled = busy || (!state.finished && state.genre === null);
+  for (const selector of ['#continue-button', '#confirm-answer']) {
+    setText($(selector), state.finished ? 'New game' : busy ? 'Submitting…' : 'Select');
+  }
   $$('#final-viewport button').forEach((button) => { button.disabled = busy || state.finished; });
 }
 
 function playerIcon(playing = false) {
   $$('.play-link').forEach((button, index) => {
-    button.querySelector('span').textContent = playing ? 'Ⅱ' : '▷';
-    button.setAttribute('aria-label', `${playing ? 'Pause' : 'Play'} ${index ? 'second' : 'first'} sample`);
+    setText(button.querySelector('span'), playing ? 'Ⅱ' : '▷');
+    setAttr(button, 'aria-label', `${playing ? 'Pause' : 'Play'} ${index ? 'second' : 'first'} sample`);
   });
 }
 
@@ -108,7 +120,7 @@ async function toggleAudio() {
   if (!player.paused) { player.pause(); return; }
   const version = audioVersion;
   const button = $(`#${state.stage} .play-link`);
-  button.querySelector('span').textContent = '…';
+  setText(button.querySelector('span'), '…');
   if (!state.finished) message();
   try {
     if (player.error) player.load();
@@ -176,7 +188,7 @@ async function previewGenre(genre) {
 candidatePlayer.addEventListener('playing', () => {
   if (audioOwner !== 'candidate' || state.finished) { candidatePlayer.pause(); return; }
   candidateIndicator('playing');
-  $('#answer-note').textContent = `${candidateGenre.name} selected. Playing comparison sample.`;
+  setText($('#answer-note'), `${candidateGenre.name} selected. Playing comparison sample.`);
 });
 candidatePlayer.addEventListener('pause', () => {
   if (candidatePlayer.paused) candidateIndicator();
@@ -196,7 +208,7 @@ function renderRound() {
     card.className = 'cluster-card';
     card.tabIndex = 0;
     card.setAttribute('role', 'button');
-    card.setAttribute('aria-label', `Cluster ${index + 1}: ${group.genres.map(genre => genre.name).join(', ')}`);
+    setAttr(card, 'aria-label', `Cluster ${index + 1}: ${group.genres.map(genre => genre.name).join(', ')}`);
     card.setAttribute('aria-pressed', 'false');
     const viewport = document.createElement('div');
     viewport.className = 'cluster-viewport';
@@ -211,14 +223,14 @@ function renderRound() {
         item.setAttribute('aria-pressed', String(i === index));
       });
       $('#continue-button').disabled = false;
-      $('#cluster-choice').textContent = `Cluster ${index + 1} selected.`;
+      setText($('#cluster-choice'), `Cluster ${index + 1} selected.`);
     };
     card.addEventListener('click', choose);
     card.addEventListener('keydown', (event) => {
       if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); choose(); }
     });
   });
-  $('#continue-button').textContent = 'Select';
+  setText($('#continue-button'), 'Select');
   $('#continue-button').disabled = true;
 }
 
@@ -228,7 +240,7 @@ function chooseGenre(name, genre) {
   state.genre = genre.id;
   finalScene.select(name);
   $('#confirm-answer').disabled = false;
-  $('#answer-note').textContent = `${name} selected.`;
+  setText($('#answer-note'), `${name} selected.`);
   previewGenre(genre);
 }
 
@@ -236,8 +248,8 @@ function renderFinal() {
   finalScene = new GenreCluster($('#final-viewport'), state.finalCluster.genres, {
     selectable: true, large: true, onSelect: chooseGenre,
   });
-  finalScene.items.forEach(({ label }) => { label.title = 'Listen and select'; });
-  $('#confirm-answer').textContent = 'Select';
+  finalScene.items.forEach(({ label }) => { setAttr(label, 'title', 'Listen and select'); });
+  setText($('#confirm-answer'), 'Select');
   $('#confirm-answer').disabled = true;
 }
 
@@ -253,10 +265,10 @@ function showStage() {
   $('.site-header').hidden = playing;
   $('.site-footer').hidden = playing;
   $$('.page').forEach((section) => { section.hidden = section.id !== state.stage; });
-  $$('.game-message').forEach((node) => { node.hidden = true; node.textContent = ''; });
-  $('#cluster-choice').textContent = '';
-  $('#answer-note').textContent = '';
-  document.title = `${state.stage === 'setup' ? 'Genreguessr' : state.stage === 'round-one' ? 'Round one' : 'Round two'} — Cartography & BGMs`;
+  $$('.game-message').forEach((node) => { node.hidden = true; setText(node, ''); });
+  setText($('#cluster-choice'), '');
+  setText($('#answer-note'), '');
+  setText(document.querySelector('title'), `${state.stage === 'setup' ? 'Genreguessr' : state.stage === 'round-one' ? 'Round one' : 'Round two'} — Cartography & BGMs`);
   if (state.stage === 'round-one') renderRound();
   if (state.stage === 'final') renderFinal();
   syncAddress();
@@ -278,7 +290,7 @@ function finish(result) {
     link.textContent = result.target.name;
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
-    link.title = 'View this genre on Every Noise at Once';
+    setAttr(link, 'title', 'View this genre on Every Noise at Once');
     answer.append(link);
   } else {
     answer.append(result.target.name);
@@ -286,7 +298,7 @@ function finish(result) {
   $$('.cluster-card').forEach((card) => { card.setAttribute('aria-disabled', 'true'); card.tabIndex = -1; });
   $$('#final-viewport button').forEach((button) => { button.disabled = true; });
   const button = $(state.stage === 'round-one' ? '#continue-button' : '#confirm-answer');
-  button.textContent = 'New game';
+  setText(button, 'New game');
 }
 
 function newGame() {
@@ -296,6 +308,32 @@ function newGame() {
   message();
   showStage();
   setBusy(false);
+}
+
+function applySelection(result) {
+  if (result.stage === 'finished') { finish(result); return true; }
+  if (result.stage === 'final' && state.stage === 'round-one') {
+    state.finalCluster = result.cluster;
+    state.stage = 'final';
+    showStage();
+    setAudio(result.audio, result.audio_available);
+    return true;
+  }
+  return false;
+}
+
+async function recoverSelection(error) {
+  message('Checking your submitted answer…');
+  try {
+    if (applySelection(await request(`/api/games/${state.id}`))) return;
+  } catch (recoveryError) {
+    if (recoveryError.data?.code === 'game_not_found') {
+      state.finished = true;
+      message('This game has expired. Start a new game.');
+      return;
+    }
+  }
+  message(error.message || 'Could not confirm your answer. Press Select to retry safely.');
 }
 
 $('#arrangement-form').addEventListener('input', updateParameters);
@@ -331,14 +369,8 @@ $('#continue-button').addEventListener('click', async () => {
   setBusy(true);
   try {
     const result = await request(`/api/games/${state.id}/cluster`, { cluster_id: state.cluster });
-    if (result.stage === 'finished') finish(result);
-    else {
-      state.finalCluster = result.cluster;
-      state.stage = result.stage;
-      showStage();
-      setAudio(result.audio, result.audio_available);
-    }
-  } catch (error) { message(error.message); }
+    applySelection(result);
+  } catch (error) { await recoverSelection(error); }
   finally { setBusy(false); }
 });
 
@@ -350,7 +382,7 @@ $('#confirm-answer').addEventListener('click', async () => {
   setBusy(true);
   try {
     finish(await request(`/api/games/${state.id}/genre`, { genre_id: state.genre }));
-  } catch (error) { message(error.message); }
+  } catch (error) { await recoverSelection(error); }
   finally { setBusy(false); }
 });
 
@@ -360,7 +392,7 @@ showStage();
 try {
   const status = await request('/api/status');
   ready = status.ready;
-  $('#catalog-caption').textContent = `${status.genres.toLocaleString('en-US')} genres`;
+  setText($('#catalog-caption'), `${status.genres.toLocaleString('en-US')} genres`);
   setBusy(false);
 } catch {
   $('#load-error').hidden = false;

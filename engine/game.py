@@ -32,6 +32,9 @@ class _Session:
     settings: dict
     expires: float
     stage: str = "preparing"
+    cluster_response: dict = field(default_factory=dict)
+    result: dict = field(default_factory=dict)
+    chosen_genre: int = None
     tracks: tuple = ()
     answer_distances: dict = field(default_factory=dict)
     clusters: dict = field(default_factory=dict)
@@ -239,27 +242,36 @@ class GameService:
     def choose_cluster(self, game_id, cluster_id):
         session = self._session(game_id)
         with session.lock:
+            if isinstance(cluster_id, str) and cluster_id == session.chosen_cluster and session.cluster_response:
+                return session.cluster_response
             if session.stage != "round-one":
                 raise GameError("This round is no longer accepting a selection.",
                                 status=409, code="invalid_stage")
             if not isinstance(cluster_id, str) or cluster_id not in session.clusters:
                 raise GameError("Choose one of this game's clusters.", code="invalid_selection")
-            session.chosen_cluster = cluster_id
-            session.expires = time.monotonic() + self.ttl_seconds
             if cluster_id != session.correct_cluster:
-                session.stage = "finished"
-                return {"id": session.id, "stage": session.stage, "correct": False,
-                        "target": self._revealed_genre(session.target)}
-            session.stage = "final"
-            session.unlocked_round = 2
-            return {"id": session.id, "stage": session.stage,
+                response = {"id": session.id, "stage": "finished", "correct": False,
+                            "target": self._revealed_genre(session.target)}
+            else:
+                response = {"id": session.id, "stage": "final",
                     "cluster": self._cluster(session, cluster_id),
                     "audio": f"/api/games/{session.id}/audio/2",
                     "audio_available": self._audio_available(session, 2)}
+            session.chosen_cluster = cluster_id
+            session.stage = response["stage"]
+            session.cluster_response = response
+            session.expires = time.monotonic() + self.ttl_seconds
+            if session.stage == "final":
+                session.unlocked_round = 2
+            else:
+                session.result = response
+            return response
 
     def choose_genre(self, game_id, genre_id):
         session = self._session(game_id)
         with session.lock:
+            if type(genre_id) is int and genre_id == session.chosen_genre and session.result:
+                return session.result
             if session.stage != "final":
                 raise GameError("This round is not accepting an answer.",
                                 status=409, code="invalid_stage")
@@ -267,11 +279,20 @@ class GameService:
                     genre_id not in session.clusters[session.chosen_cluster]):
                 raise GameError("Choose a genre in the selected cluster.", code="invalid_selection")
             distance = session.answer_distances[genre_id]
-            session.stage = "finished"
-            session.expires = time.monotonic() + self.ttl_seconds
-            return {"id": session.id, "stage": session.stage,
+            result = {"id": session.id, "stage": "finished",
                     "correct": genre_id == session.target, "target": self._revealed_genre(session.target),
                     "distance": distance if math.isfinite(distance) else None}
+            session.stage = "finished"
+            session.chosen_genre = genre_id
+            session.result = result
+            session.expires = time.monotonic() + self.ttl_seconds
+            return result
+
+    def get(self, game_id):
+        """Recover a lost response without accepting a second answer or leaking a target."""
+        session = self._session(game_id)
+        with session.lock:
+            return session.result or session.cluster_response or {"id": session.id, "stage": session.stage}
 
     def audio_source(self, game_id, round_number):
         """Return private track metadata for the server's media proxy, never its JSON API."""

@@ -1,3 +1,4 @@
+import { setText, setAttr } from '/i18n.js';
 import { GenreCluster } from '/genre-cluster.js';
 
 const $ = (selector) => document.querySelector(selector);
@@ -25,7 +26,7 @@ async function request(path, payload) {
 }
 
 function message(text = '') {
-  $('#setup-message').textContent = text;
+  setText($('#setup-message'), text);
   $('#setup-message').hidden = !text;
 }
 
@@ -58,7 +59,7 @@ function setBusy(busy) {
   $$('#race-form fieldset').forEach((fieldset) => { fieldset.disabled = busy; });
   $$('.randomize-genre').forEach((button) => { button.disabled = busy || !ready; });
   $('#start-race').disabled = busy || !ready;
-  $('#start-race').textContent = busy && state.stage === 'setup' ? 'Preparing…' : 'Start race →';
+  setText($('#start-race'), busy && state.stage === 'setup' ? 'Preparing…' : 'Start race →');
   $('#confirm-move').disabled = busy || !state.selected || state.selected.id === state.current?.id;
   $$('#race-viewport button').forEach((button) => { button.disabled = busy; });
 }
@@ -77,7 +78,7 @@ function showStage(stage) {
   $('.site-footer').hidden = stage !== 'setup';
   document.body.classList.toggle('playing', stage === 'race');
   document.body.classList.toggle('won', stage === 'win');
-  document.title = `${stage === 'win' ? 'You win — ' : ''}Genrerace — Cartography & BGMs`;
+  setText(document.querySelector('title'), `${stage === 'win' ? 'You win — ' : ''}Genrerace — Cartography & BGMs`);
   syncAddress();
   window.scrollTo({ top: 0, behavior: 'instant' });
   $(`#${stage}-title`).focus({ preventScroll: true });
@@ -96,22 +97,22 @@ function renderCluster() {
     if (genre.id === state.current.id) {
       label.classList.add('race-current');
       label.setAttribute('aria-current', 'location');
-      label.setAttribute('aria-label', `${genre.name}, current genre`);
+      setAttr(label, 'aria-label', `${genre.name}, current genre`);
     }
-    label.title = `Listen to ${genre.name}`;
+    setAttr(label, 'title', `Listen to ${genre.name}`);
   }
-  $('#race-announcement').textContent = `At ${state.current.name}. Goal: ${state.goal.name}. ${state.moves} ${state.moves === 1 ? 'move' : 'moves'}.`;
+  setText($('#race-announcement'), `At ${state.current.name}. Goal: ${state.goal.name}. ${state.moves} ${state.moves === 1 ? 'move' : 'moves'}.`);
   $('#race-title').focus({ preventScroll: true });
 }
 
 function renderTrace() {
-  $('#trace-count').textContent = `${state.moves} ${state.moves === 1 ? 'move' : 'moves'}`;
+  setText($('#trace-count'), `${state.moves} ${state.moves === 1 ? 'move' : 'moves'}`);
   $('#race-trace').replaceChildren(...state.route.map((genre, index) => {
     const stop = document.createElement('li');
     if (index > 0) {
       const separator = document.createElement('span');
       separator.className = 'trace-separator';
-      separator.textContent = '→';
+      setText(separator, '→');
       separator.setAttribute('aria-hidden', 'true');
       stop.append(separator);
     }
@@ -132,7 +133,7 @@ function applyRace(race) {
     selected: null });
   if (race.stage === 'win') {
     showStage('win');
-    $('#round-count').textContent = `${state.moves} ${state.moves === 1 ? 'round' : 'rounds'}`;
+    setText($('#round-count'), `${state.moves} ${state.moves === 1 ? 'round' : 'rounds'}`);
     $('#visited-route').replaceChildren(...state.route.map((genre) => {
       const stop = document.createElement('li');
       const name = document.createElement('span');
@@ -169,7 +170,7 @@ async function move() {
 
 function playbackMessage(text = '') {
   const value = text || (state.stage === 'race' && !state.goalReachable ? 'The goal is unreachable from this genre.' : '');
-  $('#race-message').textContent = value;
+  setText($('#race-message'), value);
   $('#race-message').hidden = !value;
 }
 
@@ -197,7 +198,7 @@ async function selectGenre(name, genre) {
   scene.select(name);
   const current = genre.id === state.current.id;
   $('#confirm-move').disabled = current;
-  $('#race-announcement').textContent = current ? `Listening to ${name}, your current genre.` : `${name} selected. Select to move.`;
+  setText($('#race-announcement'), current ? `Listening to ${name}, your current genre.` : `${name} selected. Select to move.`);
   playbackMessage();
   playbackIndicator('loading');
   player.src = `/api/genres/${genre.id}/audio`;
@@ -233,7 +234,7 @@ $$('.randomize-genre').forEach((button) => {
     const input = document.getElementById(button.dataset.input);
     input.value = genre.name;
     message();
-    $('#randomization-status').textContent = `${input.name === 'start' ? 'Start' : 'Goal'}: ${genre.name}.`;
+    setText($('#randomization-status'), `${input.name === 'start' ? 'Start' : 'Goal'}: ${genre.name}.`);
   });
 });
 $('#race-form').addEventListener('submit', async (event) => {
@@ -268,7 +269,7 @@ try {
       option.value = genre.name;
       return option;
     }));
-  $('#catalog-caption').textContent = `${catalog.length.toLocaleString('en-US')} genres`;
+  setText($('#catalog-caption'), `${catalog.length.toLocaleString('en-US')} genres`);
   ready = true;
   setBusy(false);
 } catch {

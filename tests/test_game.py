@@ -100,9 +100,34 @@ class GameTests(unittest.TestCase):
         self.assertEqual(result["distance"], 0)
         self.assertEqual(result["target"]["id"], 5)
         self.assertEqual(result["target"]["url"], "https://everynoise.com/engenremap-canonical-5.html")
+        self.assertEqual(self.service.choose_genre(game["id"], 5), result)
         with self.assertRaises(GameError) as replay:
-            self.service.choose_genre(game["id"], 5)
+            self.service.choose_genre(game["id"], 0)
         self.assertEqual(replay.exception.status, 409)
+
+    def test_lost_response_recovers_without_leaking_or_changing_answer(self):
+        game = self.start()
+        self.assertEqual(self.service.get(game["id"]), {"id": game["id"], "stage": "round-one"})
+        cluster = self.correct_cluster(game)["id"]
+        final = self.service.choose_cluster(game["id"], cluster)
+        self.assertEqual(self.service.choose_cluster(game["id"], cluster), final)
+        self.assertNotIn("target", self.service.get(game["id"]))
+        result = self.service.choose_genre(game["id"], 0)
+        self.assertEqual(self.service.get(game["id"]), result)
+        self.assertEqual(self.service.choose_genre(game["id"], 0), result)
+        self.assertFalse(result["correct"])
+        for changed in (5, False, "0"):
+            with self.assertRaises(GameError):
+                self.service.choose_genre(game["id"], changed)
+
+    def test_result_generation_failure_does_not_consume_answer(self):
+        game = self.start()
+        self.service.choose_cluster(game["id"], self.correct_cluster(game)["id"])
+        with patch.object(self.service, "_revealed_genre", side_effect=RuntimeError("temporary failure")):
+            with self.assertRaises(RuntimeError):
+                self.service.choose_genre(game["id"], 5)
+        self.assertEqual(self.service.get(game["id"])["stage"], "final")
+        self.assertTrue(self.service.choose_genre(game["id"], 5)["correct"])
 
     def test_wrong_cluster_finishes_without_unlocking_second_sample(self):
         game = self.start()

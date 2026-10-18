@@ -9,7 +9,7 @@ import mimetypes
 import re
 
 ROOT = Path(__file__).resolve().parent
-ASSETS = {'/', '/index.html', '/home.css', '/style.css', '/map.html', '/map.css',
+ASSETS = {'/', '/index.html', '/home.css', '/style.css', '/map.html', '/map.css', '/i18n.js', '/i18n.css', '/i18n-messages.js',
           '/map.js', '/map-data.json', '/genreguessr', '/genreguessr/',
           '/genreguessr.html', '/genreguessr.css', '/genreguessr.js',
           '/genre-cluster.js', '/genre-cluster.css',
@@ -229,6 +229,11 @@ class Handler(BaseHTTPRequestHandler):
     def serve(self, body):
         path = urlsplit(self.path).path
         try:
+            game = re.fullmatch(r'/api/games/([A-Za-z0-9_-]{1,64})', path)
+            if game:
+                service, _ = self.services()
+                self.json_response(200, service.get(game[1]), body)
+                return
             room = re.fullmatch(r'/api/rooms/([A-Za-z0-9_-]{1,64})', path)
             if room:
                 self.json_response(200, self.rooms().get(room[1], self.player_token()), body)

@@ -238,6 +238,9 @@ class HTTPTests(unittest.TestCase):
         base = f"/api/games/{game['id']}"
         self.assertEqual(self.request("GET", base + "/audio/2")[0], 409)
         self.assertEqual(self.request("POST", base + "/genre", {"genre_id": 0})[0], 409)
+        status, _, snapshot = self.request("GET", base)
+        self.assertEqual(status, 200)
+        self.assertNotIn('target', json.loads(snapshot))
         self.assertEqual(self.request("POST", base + "/cluster", {"cluster_id": []})[0], 400)
         correct = self.correct_cluster(game)
         status, _, body = self.request("POST", base + "/cluster", {"cluster_id": correct["id"]})
@@ -257,7 +260,11 @@ class HTTPTests(unittest.TestCase):
         self.assertEqual(result["distance"], 0)
         self.assertEqual(result["target"]["id"], 0)
         self.assertEqual(result["target"]["url"], "https://everynoise.com/engenremap-canonical-0.html")
-        self.assertEqual(self.request("POST", base + "/genre", {"genre_id": 0})[0], 409)
+        self.assertEqual(self.request("POST", base + "/genre", {"genre_id": 0})[0], 200)
+        self.assertEqual(self.request("POST", base + "/genre", {"genre_id": 1})[0], 409)
+        recovered_status, _, recovered_body = self.request("GET", base)
+        self.assertEqual(recovered_status, 200)
+        self.assertEqual(json.loads(recovered_body), result)
 
     def test_wrong_cluster_never_unlocks_second_sample(self):
         game = self.start()

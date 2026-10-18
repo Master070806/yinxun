@@ -37,7 +37,7 @@ def main():
                      '/genrerace', '/genrerace/', '/genrerace.html', '/genrerace.css', '/genrerace.js',
                      '/multiplayer-genreguessr', '/multiplayer-genreguessr/', '/multiplayer-genreguessr.html',
                      '/multiplayer-genrerace', '/multiplayer-genrerace/', '/multiplayer-genrerace.html',
-                     '/multiplayer.js', '/multiplayer.css']:
+                     '/multiplayer.js', '/multiplayer.css', '/i18n.js', '/i18n.css', '/i18n-messages.js']:
             with client.open(base + path) as r:
                 body = r.read()
                 assert r.status == 200 and len(body) > 0, path
