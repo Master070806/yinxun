@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { translate } from '../web/i18n-messages.js';
-import { chineseGenre, genreLabel, findGenre } from '../web/genre-names.js';
+import { chineseGenre, genreReading, genreLabel, findGenre } from '../web/genre-names.js';
 
 test('genre aliases preserve original identifiers and switch back to English', () => {
   assert.equal(genreLabel('russian synthpop'), '俄罗斯合成器流行 · russian synthpop');
@@ -9,7 +9,34 @@ test('genre aliases preserve original identifiers and switch back to English', (
   assert.equal(chineseGenre('swedish tropical house'), '瑞典热带浩室');
   assert.equal(chineseGenre('instrumental grime'), 'Grime 器乐');
   assert.equal(chineseGenre('imaginary rock'), null);
-  assert.equal(genreLabel('imaginary rock'), 'imaginary rock');
+  assert.equal(genreLabel('imaginary rock'), 'imaginary（摇滚相关） · imaginary rock');
+});
+
+test('regional suffixes and multilingual names retain their musical meaning', () => {
+  assert.equal(chineseGenre('reggaeton colombiano'), '哥伦比亚雷鬼顿');
+  assert.equal(chineseGenre('indie rock italiano'), '意大利独立摇滚');
+  assert.equal(chineseGenre('new jersey post-hardcore'), '新泽西后硬核');
+  assert.equal(chineseGenre('korean bl ost'), '韩国男同性恋题材影视原声');
+  assert.equal(chineseGenre('chicago house'), '芝加哥浩室');
+  assert.equal(chineseGenre('guzheng'), '古筝');
+  assert.equal(chineseGenre('musique pour enfants'), '儿童音乐');
+});
+
+test('partial hints do not fabricate definitions for opaque names', () => {
+  assert.deepEqual(genreReading('unfamiliar jazz'), {kind: 'partial', label: 'unfamiliar（爵士相关）'});
+  assert.deepEqual(genreReading('swedish unfamiliar'), {kind: 'partial', label: '瑞典音乐 · unfamiliar'});
+  assert.deepEqual(genreReading('completely-opaque'), {kind: 'untranslated', label: 'completely-opaque'});
+  assert.equal(genreReading('traprun').kind, 'untranslated');
+  assert.equal(genreReading('popping').kind, 'translated');
+  assert.equal(genreLabel('swedish unfamiliar', 'en'), 'swedish unfamiliar');
+  for (const name of ['constructor', 'toString', '__proto__']) assert.equal(chineseGenre(name), null);
+});
+
+test('partial hints remain searchable without changing the canonical answer', () => {
+  const original = {id: 4, name: 'unfamiliar jazz'};
+  const genres = new Map([[original.name, original]]);
+  assert.equal(findGenre(genres, 'unfamiliar（爵士相关）'), original);
+  assert.equal(findGenre(genres, genreLabel(original.name)), original);
 });
 
 test('Chinese and bilingual search return original genre records, ambiguous aliases do not', () => {

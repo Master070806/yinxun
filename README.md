@@ -13,9 +13,17 @@ Chinese aliases require selecting the bilingual suggestion. Player nicknames rem
 unchanged. The legacy map remains a separate Chinese-only experiment.
 
 `web/genre-names.js` contains editable display aliases and conservative composition
-rules. This first pass covers 2,440 of the 6,291 names in the supplied crawl. These
-are reading aids, not official genre definitions; unrecognized names retain their
-original text. Regional and small-scene names still need further editorial work.
+rules. In the supplied 6,291-name snapshot, **5,591** have a complete Chinese
+reading aid (up from 2,440), **274** have a partial family/region hint with the
+unresolved term preserved, and **426** retain their source name pending research.
+These are translations or descriptive reading aids, not official genre definitions.
+Partial hints such as `…（爵士相关）` explain only the recognized part of a name.
+Unknown compound words are not assigned a genre based on a substring.
+
+To audit coverage without publishing the crawl, supply a private JSON array of
+names to `node scripts/check_genre_translations.mjs /path/to/genre-names.json`.
+The report distinguishes complete, partial and untranslated entries, lists the
+remaining work, and verifies original English names/IDs still resolve correctly.
 
 **Genreguessr** is a two-round listening game built on [Every Noise at Once](https://everynoise.com/). It uses a consistent local snapshot of **6,291 genres**, with their map coordinates, colors, musical neighborhoods, contrasting neighborhoods, and song samples. Three selectable metrics determine what it means for genres to be close.
 

@@ -1,6 +1,7 @@
 // English source strings remain the fallback. Only UI text is registered here;
 // genre names and player input must never be translated or inserted as HTML.
 const zh = {
+  'Chinese genre labels include translations and short explanations. Some rare names show only a known musical family or region alongside the original term. Switch to English at any time to see the source names.': '中文风格名称包含译名与简短释义。部分小众名称仅解释已识别的音乐大类或地区，并保留原词；无法确认含义的名称仍用原文。游玩中随时可切换英文查看原始名称。',
   'Genreguessr': '听音猜风格', 'Genrerace': '风格竞速',
   'Multiplayer Genreguessr': '多人听音猜风格', 'Multiplayer Genrerace': '多人风格竞速',
   'About': '关于', 'Multiplayer': '多人游戏',
