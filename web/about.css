@@ -22,8 +22,7 @@ body {
   flex-direction: column;
 }
 
-header,
-footer {
+header {
   text-align: center;
 }
 
@@ -42,12 +41,14 @@ main {
   flex: 1;
   display: flex;
   align-items: center;
-  width: min(520px, 100%);
+  width: min(560px, 100%);
   margin: 0 auto;
 }
 
 article {
+  width: 100%;
   padding: 64px 0 76px;
+  text-align: center;
 }
 
 h1 {
@@ -71,6 +72,19 @@ article p:last-child {
   margin-bottom: 0;
 }
 
+h2 {
+  margin: 0 0 12px;
+  font-size: 19px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+article .paper-link {
+  margin-top: 32px;
+  font-size: 14px;
+  color: #777267;
+}
+
 a {
   color: inherit;
   text-decoration-thickness: 1px;
@@ -80,19 +94,6 @@ a {
 a:focus-visible {
   outline: 1px solid #777166;
   outline-offset: 5px;
-}
-
-footer p {
-  margin: 0;
-  color: #777166;
-  font-size: 13px;
-  font-style: italic;
-  line-height: 1.8;
-}
-
-footer span {
-  color: #4c473e;
-  white-space: nowrap;
 }
 
 ::selection {
@@ -121,9 +122,5 @@ footer span {
   article p {
     font-size: 15px;
     line-height: 1.8;
-  }
-
-  footer p {
-    font-size: 12px;
   }
 }

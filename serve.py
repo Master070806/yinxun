@@ -17,7 +17,8 @@ ASSETS = {'/', '/index.html', '/home.css', '/style.css', '/map.html', '/map.css'
           '/multiplayer-genreguessr', '/multiplayer-genreguessr/', '/multiplayer-genreguessr.html',
           '/multiplayer-genrerace', '/multiplayer-genrerace/', '/multiplayer-genrerace.html',
           '/multiplayer.js', '/multiplayer.css',
-          '/about', '/about/', '/about.html', '/about.css'}
+          '/about', '/about/', '/about.html', '/about.css',
+          '/documents/genregames-mathematical-models.pdf'}
 ALIASES = {'/': 'index.html', '/genreguessr': 'genreguessr.html',
            '/genreguessr/': 'genreguessr.html',
            '/genrerace': 'genrerace.html', '/genrerace/': 'genrerace.html',
