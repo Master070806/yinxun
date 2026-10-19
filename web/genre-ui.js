@@ -1,9 +1,9 @@
 import { setText, currentLanguage } from '/i18n.js';
-import { chineseGenre, genreLabel } from '/genre-names.js';
+import { genreReading, genreLabel } from '/genre-names.js';
 
 export const displayGenre = name => genreLabel(name, currentLanguage());
 export function setGenreText(element, name, compact = false) {
-  setText(element, language => compact && language !== 'en' ? chineseGenre(name) || name : genreLabel(name, language));
+  setText(element, language => compact && language !== 'en' ? genreReading(name).label : genreLabel(name, language));
   if (compact) element.title = name;
 }
 
